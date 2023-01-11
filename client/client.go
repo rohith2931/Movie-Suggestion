@@ -1,0 +1,113 @@
+package main
+
+import (
+	"context"
+	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/schema"
+	"fmt"
+	"log"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+const (
+	address = "localhost:50501" // port address for client
+)
+
+func main() {
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	schema.CheckError(err)
+	defer conn.Close()
+
+	client := pb.NewMsDatabaseCrudClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	//Creating a new user
+
+	new_user, err := client.CreateUser(ctx, &pb.NewUser{
+		UserName:    "sam",
+		Password:    "sam",
+		Email:       "sam@mail",
+		PhoneNumber: "7454532421",
+		Address:     "LA",
+	})
+	schema.CheckError(err)
+
+	log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
+
+	//Get All Movies
+	AllMovies, err := client.GetAllMovies(ctx, &pb.EmptyMovie{})
+	schema.CheckError(err)
+
+	for _, movie := range AllMovies.Movies {
+		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
+	}
+
+	//Create a movie
+	NewMovie, err := client.AddMovie(ctx, &pb.NewMovie{
+		Name:        "F2",
+		Director:    "Anil Ravipudi",
+		Description: "Fun and frustation",
+		Rating:      7,
+		Language:    "Telugu",
+		Category:    "Drama",
+		ReleaseDate: "12-01-2019",
+	})
+	schema.CheckError(err)
+	fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
+
+	//Get all Movies by category
+	AllMovies, err = client.GetMovieByCategory(ctx, &pb.MovieCategory{Category: "Drama"})
+	schema.CheckError(err)
+	log.Println("search by Category")
+	for _, movie := range AllMovies.Movies {
+		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
+	}
+
+	//Add movie to Watchlist by user
+	// Movie, err := client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
+	// 	UserId:  2,
+	// 	MovieId: 2,
+	// })
+	// schema.CheckError(err)
+	// fmt.Printf("%+v", Movie)
+
+	// Movie, err = client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
+	// 	UserId:  2,
+	// 	MovieId: 1,
+	// })
+	// schema.CheckError(err)
+	// fmt.Printf("%+v", Movie)
+
+	//Delete a movie
+	DeletedMovie, err := client.DeleteMovie(ctx, &pb.Movie{
+		Id: 1,
+	})
+	schema.CheckError(err)
+	fmt.Println("Deleted movie is:")
+	fmt.Println(DeletedMovie.GetId(), DeletedMovie.GetName(), DeletedMovie.GetDirector(), DeletedMovie.GetDescription(), DeletedMovie.GetRating(), NewMovie.GetLanguage(), DeletedMovie.GetCategory(), DeletedMovie.GetReleaseDate())
+
+	//Create Review to a movie
+	newReview, err := client.CreateReview(ctx, &pb.NewReview{
+		Rating:      8,
+		MovieId:     2,
+		UserId:      2,
+		Description: "excellent",
+	})
+	schema.CheckError(err)
+	fmt.Printf("\nCreated review is:\n %v\n", newReview)
+	//Update Review to a movie
+	updatedReview, err := client.UpdateReview(ctx, &pb.Review{
+		Id:          1,
+		Rating:      5,
+		MovieId:     1,
+		UserId:      1,
+		Description: "Very Good",
+	})
+	schema.CheckError(err)
+	fmt.Printf("\nUpdated review is:\n %v\n", updatedReview)
+}
