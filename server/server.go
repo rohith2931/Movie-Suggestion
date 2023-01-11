@@ -38,13 +38,13 @@ func (s *msServer) CreateUser(ctx context.Context, in *pb.NewUser) (*pb.User, er
 	return &pb.User{UserName: in.GetUserName(), Password: in.GetPassword(), Email: in.GetEmail(), PhoneNumber: in.GetPhoneNumber(), Id: uint64(newUser.ID)}, nil
 }
 
-func (s *msServer) GetAllMovies(ctx context.Context, in *pb.EmptyMovie) (*pb.Movies, error) {
+func (s *msServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabaseCrud_GetAllMoviesServer) error {
 	log.Printf("Getting movies called")
 	Movies := []schema.Movie{}
-	AllMovies := []*pb.Movie{}
+	// AllMovies := []*pb.Movie{}
 	s.Db.Find(&Movies)
 	for _, movie := range Movies {
-		AllMovies = append(AllMovies, &pb.Movie{
+		Movie := &pb.Movie{
 			Id:          uint64(movie.ID),
 			Name:        movie.Name,
 			Director:    movie.Director,
@@ -53,9 +53,12 @@ func (s *msServer) GetAllMovies(ctx context.Context, in *pb.EmptyMovie) (*pb.Mov
 			Language:    movie.Language,
 			Category:    movie.Category,
 			ReleaseDate: movie.ReleaseDate,
-		})
+		}
+		if err := stream.Send(Movie); err != nil {
+			return err
+		}
 	}
-	return &pb.Movies{Movies: AllMovies}, nil
+	return nil
 }
 
 func (s *msServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory) (*pb.Movies, error) {

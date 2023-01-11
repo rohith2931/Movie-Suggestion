@@ -5,6 +5,7 @@ import (
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"fmt"
+	"io"
 	"log"
 	"time"
 
@@ -40,12 +41,20 @@ func main() {
 	log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
 
 	//Get All Movies
-	AllMovies, err := client.GetAllMovies(ctx, &pb.EmptyMovie{})
+	stream, err := client.GetAllMovies(ctx, &pb.EmptyMovie{})
 	schema.CheckError(err)
-
-	for _, movie := range AllMovies.Movies {
-		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
+	fmt.Println("All movies:")
+	for {
+		movie, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		fmt.Printf("%v\n", movie)
 	}
+
+	// for _, movie := range AllMovies.Movies {
+	// 	fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
+	// }
 
 	//Create a movie
 	NewMovie, err := client.AddMovie(ctx, &pb.NewMovie{
@@ -61,10 +70,10 @@ func main() {
 	fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
 
 	//Get all Movies by category
-	AllMovies, err = client.GetMovieByCategory(ctx, &pb.MovieCategory{Category: "Drama"})
+	AllMoviesByCategory, err := client.GetMovieByCategory(ctx, &pb.MovieCategory{Category: "Drama"})
 	schema.CheckError(err)
 	log.Println("search by Category")
-	for _, movie := range AllMovies.Movies {
+	for _, movie := range AllMoviesByCategory.Movies {
 		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
 	}
 

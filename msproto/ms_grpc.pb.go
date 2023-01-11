@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsDatabaseCrudClient interface {
 	CreateUser(ctx context.Context, in *NewUser, opts ...grpc.CallOption) (*User, error)
-	GetAllMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (*Movies, error)
+	GetAllMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (MsDatabaseCrud_GetAllMoviesClient, error)
 	GetMovieByCategory(ctx context.Context, in *MovieCategory, opts ...grpc.CallOption) (*Movies, error)
 	AddMovie(ctx context.Context, in *NewMovie, opts ...grpc.CallOption) (*Movie, error)
 	DeleteMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*Movie, error)
@@ -51,13 +51,36 @@ func (c *msDatabaseCrudClient) CreateUser(ctx context.Context, in *NewUser, opts
 	return out, nil
 }
 
-func (c *msDatabaseCrudClient) GetAllMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (*Movies, error) {
-	out := new(Movies)
-	err := c.cc.Invoke(ctx, "/msproto.MsDatabaseCrud/GetAllMovies", in, out, opts...)
+func (c *msDatabaseCrudClient) GetAllMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (MsDatabaseCrud_GetAllMoviesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &MsDatabaseCrud_ServiceDesc.Streams[0], "/msproto.MsDatabaseCrud/GetAllMovies", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &msDatabaseCrudGetAllMoviesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type MsDatabaseCrud_GetAllMoviesClient interface {
+	Recv() (*Movie, error)
+	grpc.ClientStream
+}
+
+type msDatabaseCrudGetAllMoviesClient struct {
+	grpc.ClientStream
+}
+
+func (x *msDatabaseCrudGetAllMoviesClient) Recv() (*Movie, error) {
+	m := new(Movie)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *msDatabaseCrudClient) GetMovieByCategory(ctx context.Context, in *MovieCategory, opts ...grpc.CallOption) (*Movies, error) {
@@ -137,7 +160,7 @@ func (c *msDatabaseCrudClient) UpdateReview(ctx context.Context, in *Review, opt
 // for forward compatibility
 type MsDatabaseCrudServer interface {
 	CreateUser(context.Context, *NewUser) (*User, error)
-	GetAllMovies(context.Context, *EmptyMovie) (*Movies, error)
+	GetAllMovies(*EmptyMovie, MsDatabaseCrud_GetAllMoviesServer) error
 	GetMovieByCategory(context.Context, *MovieCategory) (*Movies, error)
 	AddMovie(context.Context, *NewMovie) (*Movie, error)
 	DeleteMovie(context.Context, *Movie) (*Movie, error)
@@ -156,8 +179,8 @@ type UnimplementedMsDatabaseCrudServer struct {
 func (UnimplementedMsDatabaseCrudServer) CreateUser(context.Context, *NewUser) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedMsDatabaseCrudServer) GetAllMovies(context.Context, *EmptyMovie) (*Movies, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllMovies not implemented")
+func (UnimplementedMsDatabaseCrudServer) GetAllMovies(*EmptyMovie, MsDatabaseCrud_GetAllMoviesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllMovies not implemented")
 }
 func (UnimplementedMsDatabaseCrudServer) GetMovieByCategory(context.Context, *MovieCategory) (*Movies, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMovieByCategory not implemented")
@@ -214,22 +237,25 @@ func _MsDatabaseCrud_CreateUser_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MsDatabaseCrud_GetAllMovies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyMovie)
-	if err := dec(in); err != nil {
-		return nil, err
+func _MsDatabaseCrud_GetAllMovies_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(EmptyMovie)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(MsDatabaseCrudServer).GetAllMovies(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/msproto.MsDatabaseCrud/GetAllMovies",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsDatabaseCrudServer).GetAllMovies(ctx, req.(*EmptyMovie))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(MsDatabaseCrudServer).GetAllMovies(m, &msDatabaseCrudGetAllMoviesServer{stream})
+}
+
+type MsDatabaseCrud_GetAllMoviesServer interface {
+	Send(*Movie) error
+	grpc.ServerStream
+}
+
+type msDatabaseCrudGetAllMoviesServer struct {
+	grpc.ServerStream
+}
+
+func (x *msDatabaseCrudGetAllMoviesServer) Send(m *Movie) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _MsDatabaseCrud_GetMovieByCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -388,10 +414,6 @@ var MsDatabaseCrud_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MsDatabaseCrud_CreateUser_Handler,
 		},
 		{
-			MethodName: "GetAllMovies",
-			Handler:    _MsDatabaseCrud_GetAllMovies_Handler,
-		},
-		{
 			MethodName: "GetMovieByCategory",
 			Handler:    _MsDatabaseCrud_GetMovieByCategory_Handler,
 		},
@@ -424,6 +446,12 @@ var MsDatabaseCrud_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MsDatabaseCrud_UpdateReview_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllMovies",
+			Handler:       _MsDatabaseCrud_GetAllMovies_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "msproto/ms.proto",
 }

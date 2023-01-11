@@ -6,7 +6,7 @@ package msproto;
 
 service MsDatabaseCrud{
     rpc CreateUser(NewUser) returns (User){}
-    rpc GetAllMovies(EmptyMovie) returns (Movies){}
+    rpc GetAllMovies(EmptyMovie) returns (stream Movie){}
     rpc GetMovieByCategory(MovieCategory) returns (Movies){}
     rpc AddMovie(NewMovie) returns (Movie){}
     rpc DeleteMovie(Movie) returns (Movie){}
