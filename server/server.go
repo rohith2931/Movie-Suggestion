@@ -1,10 +1,9 @@
 package main
 
-// import "example/movieSuggestion/schema"
-
 import (
 	"context"
 	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/rating"
 	"example/movieSuggestion/schema"
 	"fmt"
 	"log"
@@ -20,7 +19,7 @@ const (
 )
 
 type msServer struct {
-	pb.UnimplementedMsDatabaseCrudServer
+	pb.UnimplementedMsDatabaseServer
 	Db *gorm.DB
 }
 
@@ -32,13 +31,13 @@ func (s *msServer) CreateUser(ctx context.Context, in *pb.NewUser) (*pb.User, er
 		Email:       in.GetEmail(),
 		PhoneNumber: in.GetPhoneNumber(),
 		Address:     in.GetAddress(),
-		Watchlist:   schema.Watchlist{Count: 0},
+		Watchlist:   &schema.Watchlist{},
 	}
 	s.Db.Create(&newUser)
 	return &pb.User{UserName: in.GetUserName(), Password: in.GetPassword(), Email: in.GetEmail(), PhoneNumber: in.GetPhoneNumber(), Id: uint64(newUser.ID)}, nil
 }
 
-func (s *msServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabaseCrud_GetAllMoviesServer) error {
+func (s *msServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
 	log.Printf("Getting movies called")
 	Movies := []schema.Movie{}
 	// AllMovies := []*pb.Movie{}
@@ -86,10 +85,15 @@ func (s *msServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 		Name:        in.GetName(),
 		Director:    in.GetDirector(),
 		Description: in.GetDescription(),
-		Rating:      int(in.GetRating()),
 		Language:    in.GetLanguage(),
 		Category:    in.GetCategory(),
 		ReleaseDate: in.GetReleaseDate(),
+	}
+	if in.GetRating() == 0 {
+		newMovie.Rating = rating.GetImdbRating(newMovie.Name)
+
+	} else {
+		newMovie.Rating = int(in.GetRating())
 	}
 	s.Db.Save(&newMovie)
 	return &pb.Movie{
@@ -120,23 +124,41 @@ func (s *msServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, er
 }
 func (s *msServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUser) (*pb.Movie, error) {
 	fmt.Println("Add to Movie by user is called")
-	user := schema.User{}
-	s.Db.Preload("Watchlist").Find(&user, in.UserId)
-	movie := schema.Movie{}
-	s.Db.Find(&movie, in.MovieId)
-	fmt.Println(user.ID, movie.ID)
-	// fmt.Println(user.Watchlist)
-	// fmt.Println(user)
-	user.Watchlist.Movies = append(user.Watchlist.Movies, movie)
-	user.Watchlist.Count = len(user.Watchlist.Movies)
-	s.Db.Save(&user)
-	fmt.Println()
+
+	watchlist := schema.Watchlist{}
+	s.Db.Model(&schema.Watchlist{}).Where("user_id=?", in.UserId).Find(&watchlist)
+
+	watchlistMoviesObj := schema.WatchlistMovies{
+		WatchlistID: watchlist.ID,
+		MovieID:     uint(in.MovieId),
+	}
+
+	s.Db.Create(&watchlistMoviesObj)
+
+	// watchlistMovies := schema.WatchlistMovies{}
+	// s.Db.Model(&schema.WatchlistMovies{}).Where("id=?", watchlist.ID).Find(&watchlistMovies)
+
+	// movie := schema.Movie{}
+	// s.Db.Find(&movie, in.MovieId)
+
+	// fmt.Println(watchlist.ID, movie.ID)
+	// // fmt.Println(user.Watchlist)
+	// // fmt.Println(user)
+	// fmt.Printf("%v\n", watchlist)
+	// // watchlist.Movies = append(watchlist.Movies, movie)
+	// s.Db.Model(&schema.Watchlist{}).Where("user_id", in.UserId).Association("Movies").Append(&movie)
+	// // watchlist.Count = len(watchlist.Movies)
+	// s.Db.Save(&watchlist)
+	// fmt.Println()
+	// fmt.Printf("%v\n", watchlist)
+
 	// fmt.Println(user.Watchlist)
 	// fmt.Println(user)
 
 	return &pb.Movie{}, nil
 }
 func (s *msServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Review, error) {
+	fmt.Println("Create review is called")
 	newReview := schema.Review{
 		Rating:      int(in.Rating),
 		MovieID:     uint(in.MovieId),
@@ -188,7 +210,7 @@ func main() {
 
 	//create new server
 	new_server := grpc.NewServer()
-	pb.RegisterMsDatabaseCrudServer(new_server, &msServer{
+	pb.RegisterMsDatabaseServer(new_server, &msServer{
 		Db: db,
 	})
 

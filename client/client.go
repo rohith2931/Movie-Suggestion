@@ -22,9 +22,9 @@ func main() {
 	schema.CheckError(err)
 	defer conn.Close()
 
-	client := pb.NewMsDatabaseCrudClient(conn)
+	client := pb.NewMsDatabaseClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	//Creating a new user
@@ -58,13 +58,13 @@ func main() {
 
 	//Create a movie
 	NewMovie, err := client.AddMovie(ctx, &pb.NewMovie{
-		Name:        "F2",
-		Director:    "Anil Ravipudi",
-		Description: "Fun and frustation",
-		Rating:      7,
-		Language:    "Telugu",
-		Category:    "Drama",
-		ReleaseDate: "12-01-2019",
+		Name:        "Avengers",
+		Director:    "Joss Whedon",
+		Description: "Superhero Film",
+		Rating:      8,
+		Language:    "English",
+		Category:    "Action",
+		ReleaseDate: "04-05-2012",
 	})
 	schema.CheckError(err)
 	fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
@@ -77,20 +77,21 @@ func main() {
 		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
 	}
 
-	//Add movie to Watchlist by user
-	// Movie, err := client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
-	// 	UserId:  2,
-	// 	MovieId: 2,
-	// })
-	// schema.CheckError(err)
-	// fmt.Printf("%+v", Movie)
+	// Add movie to Watchlist by user
+	fmt.Println("Adding movie to watchlist:")
+	Movie, err := client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
+		UserId:  2,
+		MovieId: 2,
+	})
+	schema.CheckError(err)
+	fmt.Printf("%+v\n", Movie)
 
-	// Movie, err = client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
-	// 	UserId:  2,
-	// 	MovieId: 1,
-	// })
-	// schema.CheckError(err)
-	// fmt.Printf("%+v", Movie)
+	Movie, err = client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
+		UserId:  2,
+		MovieId: 1,
+	})
+	schema.CheckError(err)
+	fmt.Printf("%+v\n", Movie)
 
 	//Delete a movie
 	DeletedMovie, err := client.DeleteMovie(ctx, &pb.Movie{

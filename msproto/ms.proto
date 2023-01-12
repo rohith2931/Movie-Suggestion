@@ -4,7 +4,7 @@ option go_package = "example/movieSuggestion";
 
 package msproto;
 
-service MsDatabaseCrud{
+service MsDatabase {
     rpc CreateUser(NewUser) returns (User){}
     rpc GetAllMovies(EmptyMovie) returns (stream Movie){}
     rpc GetMovieByCategory(MovieCategory) returns (Movies){}
@@ -32,9 +32,12 @@ message User {
     string email = 4;
     string phone_number = 5;
     string address=6;
-}
+} 
+
 message EmptyMovie {
+
 }
+
 message Movie {
     uint64 id = 1;
     string name = 2;
@@ -45,6 +48,7 @@ message Movie {
     string category = 7;
     string release_date = 8;
 }
+
 message NewMovie {
     string name = 1;
     string director = 2;
@@ -54,24 +58,27 @@ message NewMovie {
     string category = 6;
     string release_date = 7;
 }
-message MovieCategory{
+message MovieCategory {
     string category=1;
 }
-message Movies{
+
+message Movies {
     repeated Movie movies=1;
 }
 
-message AddMovieByUser{
+message AddMovieByUser {
     uint64 user_id=1;
     uint64 movie_id=2;
 }
-message NewReview{
+
+message NewReview {
     uint64 rating =1;
     uint64 movie_id=2;
     uint64 user_id=3;
     string description=4;
 }
-message Review{
+
+message Review {
     uint64 id=1;
     uint64 rating =2;
     uint64 movie_id=3;
