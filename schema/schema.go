@@ -32,7 +32,7 @@ func StartDB() {
 		Category:    "Action",
 		ReleaseDate: "21-12-2018",
 	})
-	db.Save(Movie{
+	db.Save(&Movie{
 		Name:        "F2",
 		Director:    "Anil Ravipudi",
 		Description: "Fun and frustation",

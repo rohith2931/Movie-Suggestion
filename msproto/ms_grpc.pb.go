@@ -28,10 +28,12 @@ type MsDatabaseClient interface {
 	AddMovie(ctx context.Context, in *NewMovie, opts ...grpc.CallOption) (*Movie, error)
 	DeleteMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*Movie, error)
 	AddMovieToWatchlist(ctx context.Context, in *AddMovieByUser, opts ...grpc.CallOption) (*Movie, error)
-	GetAllWatchlistMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (*Movies, error)
-	DeleteMovieFromWatchlist(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*Movie, error)
+	GetAllWatchlistMovies(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Movies, error)
+	DeleteMovieFromWatchlist(ctx context.Context, in *DeleteMovieByUser, opts ...grpc.CallOption) (*Movie, error)
 	CreateReview(ctx context.Context, in *NewReview, opts ...grpc.CallOption) (*Review, error)
 	UpdateReview(ctx context.Context, in *Review, opts ...grpc.CallOption) (*Review, error)
+	CreateLike(ctx context.Context, in *UserLike, opts ...grpc.CallOption) (*Response, error)
+	DeleteLike(ctx context.Context, in *UserLike, opts ...grpc.CallOption) (*Response, error)
 }
 
 type msDatabaseClient struct {
@@ -119,7 +121,7 @@ func (c *msDatabaseClient) AddMovieToWatchlist(ctx context.Context, in *AddMovie
 	return out, nil
 }
 
-func (c *msDatabaseClient) GetAllWatchlistMovies(ctx context.Context, in *EmptyMovie, opts ...grpc.CallOption) (*Movies, error) {
+func (c *msDatabaseClient) GetAllWatchlistMovies(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Movies, error) {
 	out := new(Movies)
 	err := c.cc.Invoke(ctx, "/msproto.MsDatabase/GetAllWatchlistMovies", in, out, opts...)
 	if err != nil {
@@ -128,7 +130,7 @@ func (c *msDatabaseClient) GetAllWatchlistMovies(ctx context.Context, in *EmptyM
 	return out, nil
 }
 
-func (c *msDatabaseClient) DeleteMovieFromWatchlist(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*Movie, error) {
+func (c *msDatabaseClient) DeleteMovieFromWatchlist(ctx context.Context, in *DeleteMovieByUser, opts ...grpc.CallOption) (*Movie, error) {
 	out := new(Movie)
 	err := c.cc.Invoke(ctx, "/msproto.MsDatabase/DeleteMovieFromWatchlist", in, out, opts...)
 	if err != nil {
@@ -155,6 +157,24 @@ func (c *msDatabaseClient) UpdateReview(ctx context.Context, in *Review, opts ..
 	return out, nil
 }
 
+func (c *msDatabaseClient) CreateLike(ctx context.Context, in *UserLike, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/msproto.MsDatabase/CreateLike", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msDatabaseClient) DeleteLike(ctx context.Context, in *UserLike, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/msproto.MsDatabase/DeleteLike", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsDatabaseServer is the server API for MsDatabase service.
 // All implementations must embed UnimplementedMsDatabaseServer
 // for forward compatibility
@@ -165,10 +185,12 @@ type MsDatabaseServer interface {
 	AddMovie(context.Context, *NewMovie) (*Movie, error)
 	DeleteMovie(context.Context, *Movie) (*Movie, error)
 	AddMovieToWatchlist(context.Context, *AddMovieByUser) (*Movie, error)
-	GetAllWatchlistMovies(context.Context, *EmptyMovie) (*Movies, error)
-	DeleteMovieFromWatchlist(context.Context, *Movie) (*Movie, error)
+	GetAllWatchlistMovies(context.Context, *UserId) (*Movies, error)
+	DeleteMovieFromWatchlist(context.Context, *DeleteMovieByUser) (*Movie, error)
 	CreateReview(context.Context, *NewReview) (*Review, error)
 	UpdateReview(context.Context, *Review) (*Review, error)
+	CreateLike(context.Context, *UserLike) (*Response, error)
+	DeleteLike(context.Context, *UserLike) (*Response, error)
 	mustEmbedUnimplementedMsDatabaseServer()
 }
 
@@ -194,10 +216,10 @@ func (UnimplementedMsDatabaseServer) DeleteMovie(context.Context, *Movie) (*Movi
 func (UnimplementedMsDatabaseServer) AddMovieToWatchlist(context.Context, *AddMovieByUser) (*Movie, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMovieToWatchlist not implemented")
 }
-func (UnimplementedMsDatabaseServer) GetAllWatchlistMovies(context.Context, *EmptyMovie) (*Movies, error) {
+func (UnimplementedMsDatabaseServer) GetAllWatchlistMovies(context.Context, *UserId) (*Movies, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllWatchlistMovies not implemented")
 }
-func (UnimplementedMsDatabaseServer) DeleteMovieFromWatchlist(context.Context, *Movie) (*Movie, error) {
+func (UnimplementedMsDatabaseServer) DeleteMovieFromWatchlist(context.Context, *DeleteMovieByUser) (*Movie, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMovieFromWatchlist not implemented")
 }
 func (UnimplementedMsDatabaseServer) CreateReview(context.Context, *NewReview) (*Review, error) {
@@ -205,6 +227,12 @@ func (UnimplementedMsDatabaseServer) CreateReview(context.Context, *NewReview) (
 }
 func (UnimplementedMsDatabaseServer) UpdateReview(context.Context, *Review) (*Review, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateReview not implemented")
+}
+func (UnimplementedMsDatabaseServer) CreateLike(context.Context, *UserLike) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLike not implemented")
+}
+func (UnimplementedMsDatabaseServer) DeleteLike(context.Context, *UserLike) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLike not implemented")
 }
 func (UnimplementedMsDatabaseServer) mustEmbedUnimplementedMsDatabaseServer() {}
 
@@ -331,7 +359,7 @@ func _MsDatabase_AddMovieToWatchlist_Handler(srv interface{}, ctx context.Contex
 }
 
 func _MsDatabase_GetAllWatchlistMovies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyMovie)
+	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -343,13 +371,13 @@ func _MsDatabase_GetAllWatchlistMovies_Handler(srv interface{}, ctx context.Cont
 		FullMethod: "/msproto.MsDatabase/GetAllWatchlistMovies",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsDatabaseServer).GetAllWatchlistMovies(ctx, req.(*EmptyMovie))
+		return srv.(MsDatabaseServer).GetAllWatchlistMovies(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MsDatabase_DeleteMovieFromWatchlist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Movie)
+	in := new(DeleteMovieByUser)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -361,7 +389,7 @@ func _MsDatabase_DeleteMovieFromWatchlist_Handler(srv interface{}, ctx context.C
 		FullMethod: "/msproto.MsDatabase/DeleteMovieFromWatchlist",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsDatabaseServer).DeleteMovieFromWatchlist(ctx, req.(*Movie))
+		return srv.(MsDatabaseServer).DeleteMovieFromWatchlist(ctx, req.(*DeleteMovieByUser))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -398,6 +426,42 @@ func _MsDatabase_UpdateReview_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsDatabaseServer).UpdateReview(ctx, req.(*Review))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MsDatabase_CreateLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLike)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsDatabaseServer).CreateLike(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/msproto.MsDatabase/CreateLike",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsDatabaseServer).CreateLike(ctx, req.(*UserLike))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MsDatabase_DeleteLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLike)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsDatabaseServer).DeleteLike(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/msproto.MsDatabase/DeleteLike",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsDatabaseServer).DeleteLike(ctx, req.(*UserLike))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -444,6 +508,14 @@ var MsDatabase_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateReview",
 			Handler:    _MsDatabase_UpdateReview_Handler,
+		},
+		{
+			MethodName: "CreateLike",
+			Handler:    _MsDatabase_CreateLike_Handler,
+		},
+		{
+			MethodName: "DeleteLike",
+			Handler:    _MsDatabase_DeleteLike_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -11,10 +11,12 @@ service MsDatabase {
     rpc AddMovie(NewMovie) returns (Movie){}
     rpc DeleteMovie(Movie) returns (Movie){}
     rpc AddMovieToWatchlist(AddMovieByUser) returns (Movie){}
-    rpc GetAllWatchlistMovies(EmptyMovie) returns (Movies){}
-    rpc DeleteMovieFromWatchlist(Movie) returns (Movie){}
+    rpc GetAllWatchlistMovies(UserId) returns (Movies){}
+    rpc DeleteMovieFromWatchlist(DeleteMovieByUser) returns (Movie){}
     rpc CreateReview(NewReview) returns (Review){}
     rpc UpdateReview(Review) returns (Review){}
+    rpc CreateLike(UserLike) returns (Response){}
+    rpc DeleteLike(UserLike) returns (Response){}
 }
 
 message NewUser {
@@ -33,6 +35,10 @@ message User {
     string phone_number = 5;
     string address=6;
 } 
+
+message UserId {
+    uint64 id=1;
+}
 
 message EmptyMovie {
 
@@ -71,6 +77,11 @@ message AddMovieByUser {
     uint64 movie_id=2;
 }
 
+message DeleteMovieByUser {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
 message NewReview {
     uint64 rating =1;
     uint64 movie_id=2;
@@ -84,4 +95,13 @@ message Review {
     uint64 movie_id=3;
     uint64 user_id=4;
     string description=5;
+}
+
+message UserLike {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
+message Response {
+    string body=1;
 }
