@@ -120,4 +120,12 @@ func main() {
 	})
 	schema.CheckError(err)
 	fmt.Printf("\nUpdated review is:\n %v\n", updatedReview)
+
+	//Get all movies from the watchlist of a user
+	watchlistMovies, err := client.GetAllWatchlistMovies(ctx, &pb.UserId{Id: 2})
+	schema.CheckError(err)
+	fmt.Println("Watchlist Movies of the User is :")
+	for _, movie := range watchlistMovies.Movies {
+		fmt.Printf("%v\n", movie)
+	}
 }
