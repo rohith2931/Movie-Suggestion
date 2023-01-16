@@ -15,7 +15,7 @@ func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Revi
 		UserID:      uint(in.UserId),
 		Description: in.Description,
 	}
-	s.Db.Create(&newReview)
+	s.Db.CreateReview(&newReview)
 	return &pb.Review{
 		Id:          uint64(newReview.ID),
 		Rating:      uint64(newReview.Rating),
@@ -33,7 +33,7 @@ func (s *MsServer) UpdateReview(ctx context.Context, in *pb.Review) (*pb.Review,
 		UserID:      uint(in.UserId),
 		Description: in.Description,
 	}
-	s.Db.Model(&schema.Review{}).Where("id=?", in.Id).Updates(review)
+	s.Db.UpdateReview(in.Id, review)
 	return &pb.Review{
 		Id:          uint64(in.Id),
 		UserId:      uint64(review.UserID),

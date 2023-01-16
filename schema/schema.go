@@ -32,6 +32,7 @@ func StartDB() {
 		Category:    "Action",
 		ReleaseDate: "21-12-2018",
 	})
+
 	db.Save(&Movie{
 		Name:        "F2",
 		Director:    "Anil Ravipudi",
@@ -41,17 +42,17 @@ func StartDB() {
 		Category:    "Drama",
 		ReleaseDate: "12-01-2019",
 	})
-	db.Debug().Save(&User{
-		UserName:    "ram",
+
+	db.Save(&User{
+		UserName:    "rohith",
 		Password:    "pass",
-		Email:       "ram@gmail.com",
+		Email:       "rohith@gmail.com",
 		PhoneNumber: "8932212342",
 		Address:     "Hyderabad",
+		Role:        "admin",
 		Watchlist:   &Watchlist{},
 	})
-	// db.Save(&Watchlist{
-	// 	UserID: 1,
-	// })
+
 	db.Save(&Review{
 		Rating:      8,
 		MovieID:     1,
@@ -67,6 +68,7 @@ type User struct {
 	Email       string
 	PhoneNumber string
 	Address     string
+	Role        string
 	Watchlist   *Watchlist
 	Review      []Review
 }
@@ -109,3 +111,8 @@ func CheckError(err error) {
 		panic(err)
 	}
 }
+
+// func (user User) Find(UserName string) (User, error) {
+// 	users:=[]User
+
+// }

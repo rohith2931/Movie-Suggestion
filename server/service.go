@@ -1,12 +1,11 @@
 package server
 
 import (
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
-
-	"github.com/jinzhu/gorm"
 )
 
 type MsServer struct {
 	pb.UnimplementedMsDatabaseServer
-	Db *gorm.DB
+	Db database.DBclient
 }

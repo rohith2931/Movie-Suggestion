@@ -10,9 +10,9 @@ import (
 
 func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
 	log.Printf("Getting movies called")
-	Movies := []schema.Movie{}
-	// AllMovies := []*pb.Movie{}
-	s.Db.Find(&Movies)
+	// Movies := []schema.Movie{}
+	// s.Db.Find(&Movies)
+	Movies := s.Db.GetAllMovies()
 	for _, movie := range Movies {
 		Movie := &pb.Movie{
 			Id:          uint64(movie.ID),
@@ -33,9 +33,8 @@ func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMo
 
 func (s *MsServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory) (*pb.Movies, error) {
 	log.Printf("get by category is called")
-	Movies := []schema.Movie{}
 	AllMovies := []*pb.Movie{}
-	s.Db.Model(&schema.Movie{}).Where("Category=?", in.Category).Find(&Movies)
+	Movies := s.Db.GetMovieByCategory(in.Category)
 	for _, movie := range Movies {
 		AllMovies = append(AllMovies, &pb.Movie{
 			Id:          uint64(movie.ID),
@@ -67,7 +66,7 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 	} else {
 		newMovie.Rating = int(in.GetRating())
 	}
-	s.Db.Save(&newMovie)
+	s.Db.AddMovie(&newMovie)
 	return &pb.Movie{
 		Name:        newMovie.Name,
 		Director:    newMovie.Director,
@@ -82,8 +81,7 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 func (s *MsServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, error) {
 	log.Printf("Delete Movie is called")
 	movie := schema.Movie{}
-	s.Db.Find(&movie, in.Id)
-	s.Db.Unscoped().Delete(&schema.Movie{}, in.Id)
+	movie = s.Db.DeleteMovie(in.Id)
 	return &pb.Movie{
 		Id:          uint64(movie.ID),
 		Name:        movie.Name,

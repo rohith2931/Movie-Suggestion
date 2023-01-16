@@ -25,13 +25,6 @@ func GetImdbRating(movieName string) int {
 	var responseObj Response
 	json.Unmarshal(body, &responseObj)
 
-	// for i, movie := range responseObj.MovieRatings {
-	// 	if i < 10 {
-	// 		fmt.Printf("%v\n", movie.Rating)
-	// 	} else {
-	// 		break
-	// 	}
-	// }
 	rating := responseObj.MovieRatings[0].Rating / 10
 	return rating
 }
