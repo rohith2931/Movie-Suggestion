@@ -58,7 +58,7 @@ func (db DBclient) CreateLike(userId uint64, movieId uint64) string {
 	if likeObj.ID != 0 {
 		return "User already liked the movie..."
 	}
-	db.Db.Debug().Create(&schema.Like{
+	db.Db.Create(&schema.Like{
 		UserID:  uint(userId),
 		MovieID: uint(movieId),
 	})

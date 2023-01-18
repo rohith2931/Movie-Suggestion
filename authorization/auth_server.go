@@ -1,10 +1,9 @@
-package server
+package authorization
 
 import (
 	"context"
 	"log"
 
-	"example/movieSuggestion/authorization"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 
@@ -15,12 +14,12 @@ import (
 
 type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
-	jwtManager *authorization.JWTManager
+	jwtManager *JWTManager
 	Db         *gorm.DB
 }
 
 // NewAuthServer returns a new auth server
-func NewAuthServer(jwtManager *authorization.JWTManager, db *gorm.DB) pb.AuthServiceServer {
+func NewAuthServer(jwtManager *JWTManager, db *gorm.DB) pb.AuthServiceServer {
 	return &AuthServer{jwtManager: jwtManager, Db: db}
 }
 

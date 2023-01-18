@@ -53,16 +53,16 @@ func main() {
 	// ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "swdsxsa")
 	defer cancel()
 
-	// //Creating a new user
-	// new_user, err := client.CreateUser(ctx, &pb.NewUser{
-	// 	UserName:    "sam",
-	// 	Password:    "sam",
-	// 	Email:       "sam@mail",
-	// 	PhoneNumber: "7454532421",
-	// 	Address:     "LA",
-	// })
-	// schema.CheckError(err)
-	// log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
+	//Creating a new user
+	new_user, err := client.CreateUser(ctx, &pb.NewUser{
+		UserName:    "sam",
+		Password:    "sam",
+		Email:       "sam@mail",
+		PhoneNumber: "7454532421",
+		Address:     "LA",
+	})
+	schema.CheckError(err)
+	log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
 
 	//Get All Movies that can be watched
 	stream, err := client.GetAllMovies(ctx, &pb.EmptyMovie{})
@@ -76,19 +76,19 @@ func main() {
 		fmt.Printf("%v\n", movie)
 	}
 
-	// //Create a movie into the database
-	// NewMovie, err := client.AddMovie(ctx, &pb.NewMovie{
-	// 	Name:        "Avengers",
-	// 	Director:    "Joss Whedon",
-	// 	Description: "Superhero Film",
-	// 	Rating:      8,
-	// 	Language:    "English",
-	// 	Category:    "Action",
-	// 	ReleaseDate: "04-05-2012",
-	// })
-	// schema.CheckError(err)
-	// fmt.Println("Created movie")
-	// fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
+	//Create a movie into the database
+	NewMovie, err := client.AddMovie(ctx, &pb.NewMovie{
+		Name:        "Avengers",
+		Director:    "Joss Whedon",
+		Description: "Superhero Film",
+		Rating:      8,
+		Language:    "English",
+		Category:    "Action",
+		ReleaseDate: "04-05-2012",
+	})
+	schema.CheckError(err)
+	fmt.Println("Created movie")
+	fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
 
 	//Get all Movies based on category/genre
 	AllMoviesByCategory, err := client.GetMovieByCategory(ctx, &pb.MovieCategory{Category: "Action"})

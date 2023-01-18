@@ -46,7 +46,7 @@ func main() {
 	defer db.Close()
 
 	jwtManager := authorization.NewJWTManager(secretKey, tokenDuration)
-	authServer := server.NewAuthServer(jwtManager, db)
+	authServer := authorization.NewAuthServer(jwtManager, db)
 
 	interceptor := authorization.NewAuthInterceptor(jwtManager, accessibleRoles())
 	//create new server
