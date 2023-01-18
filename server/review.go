@@ -4,11 +4,9 @@ import (
 	"context"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
-	"log"
 )
 
 func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Review, error) {
-	log.Println("Create review is called")
 	newReview := schema.Review{
 		Rating:      int(in.Rating),
 		MovieID:     uint(in.MovieId),
@@ -26,7 +24,6 @@ func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Revi
 }
 
 func (s *MsServer) UpdateReview(ctx context.Context, in *pb.Review) (*pb.Review, error) {
-	log.Printf("Update Review is called")
 	review := schema.Review{
 		Rating:      int(in.Rating),
 		MovieID:     uint(in.MovieId),

@@ -13,11 +13,12 @@ type Database interface {
 	AddMovie(*schema.Movie)
 	DeleteMovie(uint64) schema.Movie
 	CreateLike(uint64, uint64) string
-	DeleteLike(uint64, uint64)
+	DeleteLike(uint64, uint64) string
+	CreateReview(*schema.Review)
 	UpdateReview(uint64, schema.Review)
-	AddMovieToWatchlist(uint64, uint64)
-	GetAllWatchlistMovies(uint64)
-	DeleteMovieFromWatchlist()
+	AddMovieToWatchlist(uint64, uint64) schema.Movie
+	GetAllWatchlistMovies(uint64) []schema.Movie
+	DeleteMovieFromWatchlist(uint64, uint64) schema.Movie
 }
 
 type DBclient struct {
@@ -64,8 +65,9 @@ func (db DBclient) CreateLike(userId uint64, movieId uint64) string {
 	return "Like created Successfully.."
 }
 
-func (db DBclient) DeleteLike(userId uint64, movieId uint64) {
+func (db DBclient) DeleteLike(userId uint64, movieId uint64) string {
 	db.Db.Unscoped().Model(&schema.Like{}).Where("user_id=? and movie_id=?", userId, movieId).Delete(&schema.Like{})
+	return "Like Deleted Successfully.."
 }
 
 func (db DBclient) CreateReview(newReview *schema.Review) {

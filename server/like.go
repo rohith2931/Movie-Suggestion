@@ -11,6 +11,6 @@ func (s *MsServer) CreateLike(ctx context.Context, in *pb.UserLike) (*pb.Respons
 }
 
 func (s *MsServer) DeleteLike(ctx context.Context, in *pb.UserLike) (*pb.Response, error) {
-	s.Db.DeleteLike(in.UserId, in.MovieId)
-	return &pb.Response{Body: "Like Deleted Successfully.."}, nil
+	status := s.Db.DeleteLike(in.UserId, in.MovieId)
+	return &pb.Response{Body: status}, nil
 }

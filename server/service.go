@@ -7,5 +7,5 @@ import (
 
 type MsServer struct {
 	pb.UnimplementedMsDatabaseServer
-	Db database.DBclient
+	Db database.Database
 }

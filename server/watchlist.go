@@ -4,11 +4,9 @@ import (
 	"context"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
-	"log"
 )
 
 func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUser) (*pb.Movie, error) {
-	log.Println("Add to Movie by user is called")
 
 	movie := schema.Movie{}
 	movie = s.Db.AddMovieToWatchlist(in.UserId, in.MovieId)
@@ -26,7 +24,6 @@ func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUse
 }
 
 func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*pb.Movies, error) {
-	log.Println("Get all movies from watchlist is called")
 
 	Movies := s.Db.GetAllWatchlistMovies(in.Id)
 
@@ -47,7 +44,6 @@ func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*p
 }
 
 func (s *MsServer) DeleteMovieFromWatchlist(ctx context.Context, in *pb.DeleteMovieByUser) (*pb.Movie, error) {
-	log.Println("Delete Movie from watchlist by user is called")
 
 	movie := schema.Movie{}
 	movie = s.Db.DeleteMovieFromWatchlist(in.UserId, in.MovieId)
