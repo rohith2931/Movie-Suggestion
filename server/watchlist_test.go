@@ -4,7 +4,7 @@ import (
 	"context"
 	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 	"reflect"
 	"testing"
 
@@ -31,7 +31,7 @@ func TestAddMovieToWatchlist(t *testing.T) {
 		MovieId: 1,
 		UserId:  1,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)
@@ -68,7 +68,7 @@ func TestGetAllWatchlistMovies(t *testing.T) {
 	got, err := msServer.GetAllWatchlistMovies(ctx, &pb.UserId{
 		Id: 1,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got.Movies, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got.Movies, expected)
@@ -95,7 +95,7 @@ func TestDeleteMovieFromWatchlist(t *testing.T) {
 		MovieId: 1,
 		UserId:  1,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)

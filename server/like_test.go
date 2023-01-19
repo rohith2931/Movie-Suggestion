@@ -7,7 +7,7 @@ import (
 
 	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 
 	"github.com/golang/mock/gomock"
 )
@@ -23,7 +23,7 @@ func TestCreateLike(t *testing.T) {
 		Body: "Like created Successfully..",
 	}
 	got, err := msServer.CreateLike(ctx, &pb.UserLike{MovieId: 1, UserId: 1})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got.Body, expected.Body) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got.Body, expected.Body)
@@ -41,7 +41,7 @@ func TestDeleteLike(t *testing.T) {
 		Body: "Like Deleted Successfully..",
 	}
 	got, err := msServer.DeleteLike(ctx, &pb.UserLike{MovieId: 1, UserId: 1})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got.Body, expected.Body) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got.Body, expected.Body)

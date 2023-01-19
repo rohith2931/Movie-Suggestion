@@ -5,6 +5,7 @@ import (
 	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 	"reflect"
 	"testing"
 
@@ -73,7 +74,7 @@ func TestGetMovieByCategory(t *testing.T) {
 	got, err := msServer.GetMovieByCategory(ctx, &pb.MovieCategory{
 		Category: "Drama",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got.Movies, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got.Movies, expected)
@@ -104,7 +105,7 @@ func TestAddMovie(t *testing.T) {
 		Language:    "Telugu",
 		Category:    "Drama",
 		ReleaseDate: "12-01-2019"})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)
@@ -128,7 +129,7 @@ func TestDeleteMovie(t *testing.T) {
 		ReleaseDate: "12-01-2019",
 	}
 	got, err := msServer.DeleteMovie(ctx, &pb.Movie{Id: 1})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)

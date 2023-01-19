@@ -1,11 +1,15 @@
 package schema
 
-import "github.com/jinzhu/gorm"
+import (
+	"example/movieSuggestion/utils"
+
+	"github.com/jinzhu/gorm"
+)
 
 func StartDB() {
 	db, err := gorm.Open("postgres", "user=postgres password=root dbname=postgres sslmode=disable")
 
-	CheckError(err)
+	utils.CheckError(err)
 	defer db.Close()
 
 	db.AutoMigrate(&User{})
@@ -106,14 +110,3 @@ type Like struct {
 	UserID  uint
 	MovieID uint
 }
-
-func CheckError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-// func (user User) Find(UserName string) (User, error) {
-// 	users:=[]User
-
-// }

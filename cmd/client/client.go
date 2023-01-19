@@ -4,7 +4,7 @@ import (
 	"context"
 	"example/movieSuggestion/client"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 	"fmt"
 	"io"
 	"log"
@@ -33,7 +33,7 @@ func accessibleMethods() map[string]bool {
 
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	schema.CheckError(err)
+	utils.CheckError(err)
 	defer conn.Close()
 
 	//Create a new AuthClient with the provided Credentials
@@ -51,7 +51,7 @@ func main() {
 		grpc.WithUnaryInterceptor(interceptor.Unary()),
 		grpc.WithStreamInterceptor(interceptor.Stream()),
 	)
-	schema.CheckError(err)
+	utils.CheckError(err)
 	defer clientConnection.Close()
 	client := pb.NewMsDatabaseClient(clientConnection)
 
@@ -67,12 +67,12 @@ func main() {
 		PhoneNumber: "7454532421",
 		Address:     "LA",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
 
 	//Get All Movies that can be watched
 	stream, err := client.GetAllMovies(ctx, &pb.EmptyMovie{})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println("All movies:")
 	for {
 		movie, err := stream.Recv()
@@ -92,13 +92,13 @@ func main() {
 		Category:    "Action",
 		ReleaseDate: "04-05-2012",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println("Created movie")
 	fmt.Println(NewMovie.GetId(), NewMovie.GetName(), NewMovie.GetDirector(), NewMovie.GetDescription(), NewMovie.GetRating(), NewMovie.GetLanguage(), NewMovie.GetCategory(), NewMovie.GetReleaseDate())
 
 	//Get all Movies based on category/genre
 	AllMoviesByCategory, err := client.GetMovieByCategory(ctx, &pb.MovieCategory{Category: "Action"})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	log.Println("search by Category")
 	for _, movie := range AllMoviesByCategory.Movies {
 		fmt.Println(movie.GetId(), movie.GetName(), movie.GetDirector(), movie.GetDescription(), movie.GetRating(), movie.GetLanguage(), movie.GetCategory(), movie.GetReleaseDate())
@@ -110,21 +110,21 @@ func main() {
 		UserId:  2,
 		MovieId: 2,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println(Movie.GetId(), Movie.GetName(), Movie.GetDirector(), Movie.GetDescription(), Movie.GetRating(), Movie.GetLanguage(), Movie.GetCategory(), Movie.GetReleaseDate())
 
 	Movie, err = client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
 		UserId:  2,
 		MovieId: 1,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println(Movie.GetId(), Movie.GetName(), Movie.GetDirector(), Movie.GetDescription(), Movie.GetRating(), Movie.GetLanguage(), Movie.GetCategory(), Movie.GetReleaseDate())
 
 	// Delete a movie in the database
 	DeletedMovie, err := client.DeleteMovie(ctx, &pb.Movie{
 		Id: 1,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println("Deleted movie is:")
 	fmt.Println(DeletedMovie.GetId(), DeletedMovie.GetName(), DeletedMovie.GetDirector(), DeletedMovie.GetDescription(), DeletedMovie.GetRating(), DeletedMovie.GetLanguage(), DeletedMovie.GetCategory(), DeletedMovie.GetReleaseDate())
 
@@ -135,7 +135,7 @@ func main() {
 		UserId:      2,
 		Description: "excellent",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Printf("\nCreated review is:\n %v\n", newReview)
 
 	//Update Review to a movie
@@ -146,12 +146,12 @@ func main() {
 		UserId:      1,
 		Description: "Very Good",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Printf("\nUpdated review is:\n %v\n", updatedReview)
 
 	//Get all movies from the watchlist of a user
 	watchlistMovies, err := client.GetAllWatchlistMovies(ctx, &pb.UserId{Id: 2})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println("Watchlist Movies of the User is :")
 	for _, movie := range watchlistMovies.Movies {
 		fmt.Printf("%v\n", movie)
@@ -163,7 +163,7 @@ func main() {
 		UserId:  2,
 		MovieId: 2,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Printf("%+v\n", DeletedMovieByUser)
 
 	//Create a like by a user to a movie
@@ -171,14 +171,14 @@ func main() {
 		UserId:  1,
 		MovieId: 2,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println(RespnseObj.Body)
 
 	RespnseObj, err = client.CreateLike(ctx, &pb.UserLike{
 		UserId:  1,
 		MovieId: 3,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println(RespnseObj.Body)
 
 	//Delete/Unlike a movie by a user
@@ -186,7 +186,7 @@ func main() {
 		UserId:  1,
 		MovieId: 2,
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	fmt.Println(RespnseObj.Body)
 
 }

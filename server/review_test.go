@@ -5,6 +5,7 @@ import (
 	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 	"reflect"
 	"testing"
 
@@ -38,7 +39,7 @@ func TestCreateReview(t *testing.T) {
 		UserId:      1,
 		Description: "Good",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)
@@ -65,7 +66,7 @@ func TestUpdateReview(t *testing.T) {
 		UserId:      1,
 		Description: "Good",
 	})
-	schema.CheckError(err)
+	utils.CheckError(err)
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("The Function Retured is not expected one. got %v expected %v",
 			got, expected)
