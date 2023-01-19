@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/mocks"
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"reflect"
@@ -24,7 +24,7 @@ var sampleUser = schema.User{
 func TestCreateUser(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().CreateUser(&sampleUser)

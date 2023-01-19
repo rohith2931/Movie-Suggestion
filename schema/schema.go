@@ -43,6 +43,7 @@ func StartDB() {
 		ReleaseDate: "12-01-2019",
 	})
 
+	//Creating admin
 	db.Save(&User{
 		UserName:    "rohith",
 		Password:    "pass",

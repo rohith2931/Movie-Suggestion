@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/mocks"
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"reflect"
@@ -21,7 +21,7 @@ var sampleReview = schema.Review{
 func TestCreateReview(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 
@@ -48,7 +48,7 @@ func TestCreateReview(t *testing.T) {
 func TestUpdateReview(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 

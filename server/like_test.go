@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"example/movieSuggestion/mocks"
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 
@@ -15,7 +15,7 @@ import (
 func TestCreateLike(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().CreateLike(gomock.Any(), gomock.Any()).Return("Like created Successfully..")
@@ -33,7 +33,7 @@ func TestCreateLike(t *testing.T) {
 func TestDeleteLike(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().DeleteLike(gomock.Any(), gomock.Any()).Return("Like Deleted Successfully..")

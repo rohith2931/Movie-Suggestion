@@ -21,6 +21,7 @@ const (
 	refreshDuration = 30 * time.Second
 )
 
+// This function returns which RPC/endpoint needs authentication
 func accessibleMethods() map[string]bool {
 	const msService = "/msproto.MsDatabase/"
 	return map[string]bool{
@@ -29,25 +30,30 @@ func accessibleMethods() map[string]bool {
 		msService + "DeleteMovie": true,
 	}
 }
+
 func main() {
-	conn1, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	schema.CheckError(err)
-	defer conn1.Close()
-	authClient := client.NewAuthClient(conn1, username, password)
+	defer conn.Close()
+
+	//Create a new AuthClient with the provided Credentials
+	authClient := client.NewAuthClient(conn, username, password)
+
+	//Create client AuthInterceptor
 	interceptor, err := client.NewAuthInterceptor(authClient, accessibleMethods(), refreshDuration)
 	if err != nil {
 		log.Println("cannot create auth interceptor:", err)
 	}
 
-	conn2, err := grpc.Dial(
+	clientConnection, err := grpc.Dial(
 		address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(interceptor.Unary()),
 		grpc.WithStreamInterceptor(interceptor.Stream()),
 	)
 	schema.CheckError(err)
-	defer conn2.Close()
-	client := pb.NewMsDatabaseClient(conn2)
+	defer clientConnection.Close()
+	client := pb.NewMsDatabaseClient(clientConnection)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	// ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "swdsxsa")

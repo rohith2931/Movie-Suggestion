@@ -22,6 +22,7 @@ const (
 	tokenDuration = 15 * time.Minute
 )
 
+// This function returns list of roles who can access an endpoint/RPC
 func accessibleRoles() map[string][]string {
 	const msService = "/msproto.MsDatabase/"
 	return map[string][]string{
@@ -45,19 +46,29 @@ func main() {
 
 	defer db.Close()
 
+	//initialise a JwtManager
 	jwtManager := authorization.NewJWTManager(secretKey, tokenDuration)
+
+	//initialise a AuthServer
 	authServer := authorization.NewAuthServer(jwtManager, db)
 
+	//initialise a AuthInterceptor
 	interceptor := authorization.NewAuthInterceptor(jwtManager, accessibleRoles())
+
 	//create new server
 	new_server := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.Unary()),
 		grpc.StreamInterceptor(interceptor.Stream()),
 	)
+
+	//Register the AuthServer Service with the created server
 	pb.RegisterAuthServiceServer(new_server, authServer)
+
+	//Register the main service
 	pb.RegisterMsDatabaseServer(new_server, &server.MsServer{
 		Db: database.DBclient{Db: db},
 	})
+
 	reflection.Register(new_server)
 	log.Printf("Using port no %v", listen.Addr())
 

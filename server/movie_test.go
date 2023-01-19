@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/mocks"
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"reflect"
@@ -46,7 +46,7 @@ var sampleMovie = schema.Movie{
 func TestGetMovieByCategory(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().GetMovieByCategory(gomock.Any()).Return(sampleMovies)
@@ -83,7 +83,7 @@ func TestGetMovieByCategory(t *testing.T) {
 func TestAddMovie(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().AddMovie(gomock.Any())
@@ -114,7 +114,7 @@ func TestAddMovie(t *testing.T) {
 func TestDeleteMovie(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	mockDb.EXPECT().DeleteMovie(gomock.Any()).Return(sampleMovie)

@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/mocks"
+	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"reflect"
@@ -14,7 +14,7 @@ import (
 func TestAddMovieToWatchlist(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	expected := &pb.Movie{
@@ -41,7 +41,7 @@ func TestAddMovieToWatchlist(t *testing.T) {
 func TestGetAllWatchlistMovies(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	expected := []*pb.Movie{
@@ -78,7 +78,7 @@ func TestGetAllWatchlistMovies(t *testing.T) {
 func TestDeleteMovieFromWatchlist(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockDb := mocks.NewMockDatabase(controller)
+	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 	expected := &pb.Movie{
