@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"google.golang.org/grpc"
 )
 
 var sampleMovies = []schema.Movie{
@@ -44,6 +45,56 @@ var sampleMovie = schema.Movie{
 	ReleaseDate: "12-01-2019",
 }
 
+type mockMsDatabase_GetAllMoviesServer struct {
+	grpc.ServerStream
+	Results []*pb.Movie
+}
+
+func NewmockMsDatabase_GetAllMoviesServer() *mockMsDatabase_GetAllMoviesServer {
+	return &mockMsDatabase_GetAllMoviesServer{
+		Results: make([]*pb.Movie, 0),
+	}
+}
+func (mock mockMsDatabase_GetAllMoviesServer) Send(m *pb.Movie) error {
+	temp := &mock.Results
+	mock.Results = append(*temp, m)
+	// mock.Results = append(mock.Results, m)
+	return nil
+}
+func TestGetAllMovies(t *testing.T) {
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	mockDb := database.NewMockDatabase(controller)
+	msServer := MsServer{Db: mockDb}
+	mockDb.EXPECT().GetAllMovies().Return(sampleMovies)
+	expected := []*pb.Movie{
+		{
+			Name:        "F2",
+			Director:    "Anil Ravipudi",
+			Description: "Fun and frustation",
+			Rating:      7,
+			Language:    "Telugu",
+			Category:    "Drama",
+			ReleaseDate: "12-01-2019",
+		},
+		{
+			Name:        "F2",
+			Director:    "Anil Ravipudi",
+			Description: "Fun and frustation",
+			Rating:      7,
+			Language:    "Telugu",
+			Category:    "Drama",
+			ReleaseDate: "12-01-2019",
+		},
+	}
+	mock := NewmockMsDatabase_GetAllMoviesServer()
+	err := msServer.GetAllMovies(&pb.EmptyMovie{}, mock)
+	utils.CheckError(err)
+	if !reflect.DeepEqual(mock.Results, expected) {
+		t.Errorf("The Function Retured is not expected one. got %v expected %v",
+			mock.Results, expected)
+	}
+}
 func TestGetMovieByCategory(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()

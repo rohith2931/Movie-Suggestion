@@ -6,6 +6,7 @@ import (
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
 	"example/movieSuggestion/server"
+	"example/movieSuggestion/utils"
 	"log"
 	"net"
 	"time"
@@ -39,7 +40,7 @@ func main() {
 	}
 
 	//db connection
-	db, err := gorm.Open("postgres", "user=postgres password=root dbname=postgres sslmode=disable")
+	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
 	if err != nil {
 		panic(err.Error())
 	}

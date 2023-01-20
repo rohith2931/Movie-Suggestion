@@ -61,9 +61,9 @@ func main() {
 
 	//Creating a new user
 	new_user, err := client.CreateUser(ctx, &pb.NewUser{
-		UserName:    "sam",
+		UserName:    "jack",
 		Password:    "sam",
-		Email:       "sam@mail",
+		Email:       "seropa3842@quamox.com",
 		PhoneNumber: "7454532421",
 		Address:     "LA",
 	})
