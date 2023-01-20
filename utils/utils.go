@@ -7,12 +7,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// This function checks for error
 func CheckError(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+// This function returns the value for the key from the .env file
 func GoDotEnvVariable(key string) string {
 
 	// load .env file

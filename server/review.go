@@ -6,6 +6,7 @@ import (
 	"example/movieSuggestion/schema"
 )
 
+// This RPC creates a review for a movie by the user
 func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Review, error) {
 	newReview := schema.Review{
 		Rating:      int(in.Rating),
@@ -23,6 +24,7 @@ func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Revi
 	}, nil
 }
 
+// This RPC updates a review for a movie by the user
 func (s *MsServer) UpdateReview(ctx context.Context, in *pb.Review) (*pb.Review, error) {
 	review := schema.Review{
 		Rating:      int(in.Rating),

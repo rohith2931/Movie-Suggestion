@@ -9,12 +9,14 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// AuthInterceptor is a client interceptor used for authentication and authorization
 type AuthInterceptor struct {
 	authClient  *AuthClient
 	authMethods map[string]bool
 	accessToken string
 }
 
+// NewAuthInterceptor returns a new auth interceptor
 func NewAuthInterceptor(
 	authClient *AuthClient,
 	authMethods map[string]bool,
@@ -31,6 +33,7 @@ func NewAuthInterceptor(
 	return interceptor, nil
 }
 
+// This function returns unary client inteceptor
 func (interceptor *AuthInterceptor) Unary() grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,
@@ -47,6 +50,8 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryClientInterceptor {
 		return invoker(ctx, method, req, reply, cc, opts...)
 	}
 }
+
+// This function returns stream client inteceptor
 func (interceptor *AuthInterceptor) Stream() grpc.StreamClientInterceptor {
 	return func(
 		ctx context.Context,
@@ -63,10 +68,13 @@ func (interceptor *AuthInterceptor) Stream() grpc.StreamClientInterceptor {
 		return streamer(ctx, desc, cc, method, opts...)
 	}
 }
+
+// This function is used to attach the jwt token to the context
 func (interceptor *AuthInterceptor) attachToken(ctx context.Context) context.Context {
 	return metadata.AppendToOutgoingContext(ctx, "authorization", interceptor.accessToken)
 }
 
+// This function is used to refresh the jwt token
 func (interceptor *AuthInterceptor) scheduleRefreshToken(refreshDuration time.Duration) error {
 	err := interceptor.refreshToken()
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// AuthInterceptor is a server interceptor for authentication and authorization
+// AuthInterceptor is a server interceptor used  for authentication and authorization
 type AuthInterceptor struct {
 	jwtManager      *JWTManager
 	accessibleRoles map[string][]string
@@ -22,7 +22,7 @@ func NewAuthInterceptor(jwtManager *JWTManager, accessibleRoles map[string][]str
 	return &AuthInterceptor{jwtManager, accessibleRoles}
 }
 
-// Unary returns a server interceptor function to authenticate and authorize unary RPC
+// This function returns a server interceptor function to authenticate and authorize unary RPC
 func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
@@ -38,6 +38,8 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 		return handler(ctx, req)
 	}
 }
+
+// This function returns a server interceptor function to authenticate and authorize stream RPC
 func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 	return func(
 		srv interface{},
@@ -53,6 +55,8 @@ func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 		return handler(srv, stream)
 	}
 }
+
+// This function is used to check the user is authorized to use the endpoint/RPC
 func (interceptor *AuthInterceptor) authorize(ctx context.Context, method string) error {
 	accessibleRoles, ok := interceptor.accessibleRoles[method]
 	if !ok {

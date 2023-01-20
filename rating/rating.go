@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// This function returns the Imdb rating of a movie
 func GetImdbRating(movieName string) int {
 
 	url := fmt.Sprintf("https://mdblist.p.rapidapi.com/?s=%s&l=1", movieName)
