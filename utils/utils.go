@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
@@ -18,7 +19,7 @@ func CheckError(err error) {
 func GoDotEnvVariable(key string) string {
 
 	// load .env file
-	err := godotenv.Load(".env")
+	err := godotenv.Load(filepath.Join("/home/rohith/Pet_Project/Movie Suggestion", ".env"))
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")

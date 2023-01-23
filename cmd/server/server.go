@@ -1,7 +1,7 @@
 package main
 
 import (
-	"example/movieSuggestion/authorization"
+	authorization "example/movieSuggestion/authorization/server"
 	"example/movieSuggestion/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/schema"
@@ -27,26 +27,27 @@ const (
 func accessibleRoles() map[string][]string {
 	const msService = "/msproto.MsDatabase/"
 	return map[string][]string{
-		msService + "CreateUser":  {"admin"},
-		msService + "AddMovie":    {"admin"},
-		msService + "DeleteMovie": {"admin"},
+		msService + "CreateUser":               {"admin"},
+		msService + "AddMovie":                 {"admin"},
+		msService + "DeleteMovie":              {"admin"},
+		msService + "GetAllMovies":             {"admin", "user"},
+		msService + "GetMovieByCategory":       {"admin", "user"},
+		msService + "AddMovieToWatchlist":      {"admin", "user"},
+		msService + "GetAllWatchlistMovies":    {"admin", "user"},
+		msService + "DeleteMovieFromWatchlist": {"admin", "user"},
+		msService + "CreateReview":             {"admin", "user"},
+		msService + "UpdateReview":             {"admin", "user"},
+		msService + "CreateLike":               {"admin", "user"},
+		msService + "DeleteLike":               {"admin", "user"},
 	}
 }
-func main() {
-	schema.StartDB()
+
+func Run(db *gorm.DB) error {
+	defer db.Close()
 	listen, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	//db connection
-	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer db.Close()
-
 	//initialise a JwtManager
 	jwtManager := authorization.NewJWTManager(secretKey, tokenDuration)
 
@@ -54,7 +55,7 @@ func main() {
 	authServer := authorization.NewAuthServer(jwtManager, db)
 
 	//initialise a AuthInterceptor
-	interceptor := authorization.NewAuthInterceptor(jwtManager, accessibleRoles())
+	interceptor := authorization.NewServerAuthInterceptor(jwtManager, accessibleRoles())
 
 	//create new server
 	new_server := grpc.NewServer(
@@ -71,9 +72,20 @@ func main() {
 	})
 
 	reflection.Register(new_server)
+
 	log.Printf("Using port no %v", listen.Addr())
 
-	if err := new_server.Serve(listen); err != nil {
+	return new_server.Serve(listen)
+}
+func main() {
+	schema.StartDB()
+	// db connection
+	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if err := Run(db); err != nil {
 		log.Fatal(err.Error())
 	}
 }
