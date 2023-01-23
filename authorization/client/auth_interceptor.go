@@ -9,18 +9,20 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type AuthInterceptor struct {
+// AuthInterceptor is a client interceptor used for authentication and authorization
+type ClientAuthInterceptor struct {
 	authClient  *AuthClient
 	authMethods map[string]bool
 	accessToken string
 }
 
-func NewAuthInterceptor(
+// NewAuthInterceptor returns a new auth interceptor
+func NewClientAuthInterceptor(
 	authClient *AuthClient,
 	authMethods map[string]bool,
 	refreshDuration time.Duration,
-) (*AuthInterceptor, error) {
-	interceptor := &AuthInterceptor{
+) (*ClientAuthInterceptor, error) {
+	interceptor := &ClientAuthInterceptor{
 		authClient:  authClient,
 		authMethods: authMethods,
 	}
@@ -31,7 +33,8 @@ func NewAuthInterceptor(
 	return interceptor, nil
 }
 
-func (interceptor *AuthInterceptor) Unary() grpc.UnaryClientInterceptor {
+// This function returns unary client inteceptor
+func (interceptor *ClientAuthInterceptor) Unary() grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,
 		method string,
@@ -47,7 +50,9 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryClientInterceptor {
 		return invoker(ctx, method, req, reply, cc, opts...)
 	}
 }
-func (interceptor *AuthInterceptor) Stream() grpc.StreamClientInterceptor {
+
+// This function returns stream client inteceptor
+func (interceptor *ClientAuthInterceptor) Stream() grpc.StreamClientInterceptor {
 	return func(
 		ctx context.Context,
 		desc *grpc.StreamDesc,
@@ -63,11 +68,14 @@ func (interceptor *AuthInterceptor) Stream() grpc.StreamClientInterceptor {
 		return streamer(ctx, desc, cc, method, opts...)
 	}
 }
-func (interceptor *AuthInterceptor) attachToken(ctx context.Context) context.Context {
+
+// This function is used to attach the jwt token to the context
+func (interceptor *ClientAuthInterceptor) attachToken(ctx context.Context) context.Context {
 	return metadata.AppendToOutgoingContext(ctx, "authorization", interceptor.accessToken)
 }
 
-func (interceptor *AuthInterceptor) scheduleRefreshToken(refreshDuration time.Duration) error {
+// This function is used to refresh the jwt token
+func (interceptor *ClientAuthInterceptor) scheduleRefreshToken(refreshDuration time.Duration) error {
 	err := interceptor.refreshToken()
 	if err != nil {
 		return err
@@ -87,7 +95,7 @@ func (interceptor *AuthInterceptor) scheduleRefreshToken(refreshDuration time.Du
 	return nil
 }
 
-func (interceptor *AuthInterceptor) refreshToken() error {
+func (interceptor *ClientAuthInterceptor) refreshToken() error {
 	accessToken, err := interceptor.authClient.Login()
 	if err != nil {
 		return err

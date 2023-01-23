@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// AuthServer is used to authenticate the user
 type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
 	jwtManager *JWTManager
@@ -23,6 +24,7 @@ func NewAuthServer(jwtManager *JWTManager, db *gorm.DB) pb.AuthServiceServer {
 	return &AuthServer{jwtManager: jwtManager, Db: db}
 }
 
+// This RPC is used to login the user and return jwt token as a response
 func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	log.Println("Server : Logging in the User")
 	user := schema.User{

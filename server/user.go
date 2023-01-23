@@ -7,6 +7,7 @@ import (
 	"example/movieSuggestion/schema"
 )
 
+// This RPC creates a user
 func (s *MsServer) CreateUser(ctx context.Context, in *pb.NewUser) (*pb.User, error) {
 	newUser := schema.User{
 		UserName:    in.GetUserName(),

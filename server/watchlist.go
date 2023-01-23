@@ -6,6 +6,7 @@ import (
 	"example/movieSuggestion/schema"
 )
 
+// This RPC adds movie into the watchlist
 func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUser) (*pb.Movie, error) {
 
 	movie := schema.Movie{}
@@ -23,6 +24,7 @@ func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUse
 	}, nil
 }
 
+// This RPC gets all movies from the watchlist of a user
 func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*pb.Movies, error) {
 
 	Movies := s.Db.GetAllWatchlistMovies(in.Id)
@@ -43,6 +45,7 @@ func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*p
 	return &pb.Movies{Movies: AllMovies}, nil
 }
 
+// This RPC deletes a movie from the watchlist
 func (s *MsServer) DeleteMovieFromWatchlist(ctx context.Context, in *pb.DeleteMovieByUser) (*pb.Movie, error) {
 
 	movie := schema.Movie{}

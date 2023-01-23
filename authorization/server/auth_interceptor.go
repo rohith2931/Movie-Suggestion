@@ -11,19 +11,19 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// AuthInterceptor is a server interceptor for authentication and authorization
-type AuthInterceptor struct {
+// AuthInterceptor is a server interceptor used  for authentication and authorization
+type ServerAuthInterceptor struct {
 	jwtManager      *JWTManager
 	accessibleRoles map[string][]string
 }
 
 // NewAuthInterceptor returns a new auth interceptor
-func NewAuthInterceptor(jwtManager *JWTManager, accessibleRoles map[string][]string) *AuthInterceptor {
-	return &AuthInterceptor{jwtManager, accessibleRoles}
+func NewServerAuthInterceptor(jwtManager *JWTManager, accessibleRoles map[string][]string) *ServerAuthInterceptor {
+	return &ServerAuthInterceptor{jwtManager, accessibleRoles}
 }
 
-// Unary returns a server interceptor function to authenticate and authorize unary RPC
-func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
+// This function returns a server interceptor function to authenticate and authorize unary RPC
+func (interceptor *ServerAuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -38,7 +38,9 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 		return handler(ctx, req)
 	}
 }
-func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
+
+// This function returns a server interceptor function to authenticate and authorize stream RPC
+func (interceptor *ServerAuthInterceptor) Stream() grpc.StreamServerInterceptor {
 	return func(
 		srv interface{},
 		stream grpc.ServerStream,
@@ -53,7 +55,9 @@ func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 		return handler(srv, stream)
 	}
 }
-func (interceptor *AuthInterceptor) authorize(ctx context.Context, method string) error {
+
+// This function is used to check the user is authorized to use the endpoint/RPC
+func (interceptor *ServerAuthInterceptor) authorize(ctx context.Context, method string) error {
 	accessibleRoles, ok := interceptor.accessibleRoles[method]
 	if !ok {
 		return nil

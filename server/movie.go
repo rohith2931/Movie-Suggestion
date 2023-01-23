@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+// This RPC returns all movies that are present in the database
 func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
 	log.Printf("Getting movies called")
 	// Movies := []schema.Movie{}
@@ -31,6 +32,7 @@ func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMo
 	return nil
 }
 
+// This RPC returns all movies based on category/genere
 func (s *MsServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory) (*pb.Movies, error) {
 	AllMovies := []*pb.Movie{}
 	Movies := s.Db.GetMovieByCategory(in.Category)
@@ -49,6 +51,7 @@ func (s *MsServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory)
 	return &pb.Movies{Movies: AllMovies}, nil
 }
 
+// This RPC adds movie into the database
 func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, error) {
 
 	newMovie := schema.Movie{
@@ -77,6 +80,7 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 		Id:          uint64(newMovie.ID)}, nil
 }
 
+// This RPC Delete a movie from the database
 func (s *MsServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, error) {
 	movie := schema.Movie{}
 	movie = s.Db.DeleteMovie(in.Id)
