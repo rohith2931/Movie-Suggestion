@@ -65,7 +65,7 @@ func main() {
 	client := pb.NewMsDatabaseClient(clientConnection)
 
 	createNewUser(client)
-	createNewMovie(client)
+	// createNewMovie(client)
 	// deleteMovie(client)
 	// getAllMovies(client)
 	// getMoviesByCategory(client)
@@ -84,7 +84,7 @@ func createNewUser(client pb.MsDatabaseClient) {
 
 	//Creating a new user
 	new_user, err := client.CreateUser(ctx, &pb.NewUser{
-		UserName:    "vicky",
+		UserName:    "sam",
 		Password:    "sam",
 		Email:       "seropa3842@quamox.com",
 		PhoneNumber: "7454532421",

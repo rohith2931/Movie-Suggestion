@@ -3,37 +3,55 @@ package Mail
 import (
 	"example/movieSuggestion/utils"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
-
-	"gopkg.in/gomail.v2"
 )
 
-var mailKeys = strings.Split(utils.GoDotEnvVariable("MailKeys"), ",")
-var index = 0
+var AdminMail = "admin@gmail.com"
 
 // This function returns mail body
 func MailInfo(username string, receiver string) string {
-	mailContent := fmt.Sprintf("Your Account is Successfully Created..<br><br> <b>Your account details are : </b> <br><br> Username : %s <br><br> Email : %s <br> ", username, receiver)
+	mailContent := fmt.Sprintf(`{
+	    "personalizations": [
+	        {
+	            "to": [
+	                {
+	                    "email": `+`"%s"`+`
+	                }
+	            ],
+	            "subject": "Hello `+`%s`+`"
+	        }
+	    ],
+	    "from": {
+	        "email": `+`"%s"`+`
+	    },
+	    "content": [
+	        {
+	            "type": "text/plain",
+	            "value":`+` "Your Account is Successfully Created .\n\n Your Account details are :\n\n Username : `+fmt.Sprint(username)+` \n\n Email : `+fmt.Sprint(receiver)+`"
+			}
+	    ]
+	}`, receiver, username, AdminMail)
 	return mailContent
 }
 
 // This function is used to send mail telling that account is created
-func SendMail(username string, receiver string, mailInfo string) {
-	msg := gomail.NewMessage()
-	msg.SetHeader("From", "admin@gmail.com")
-	msg.SetHeader("To", receiver)
-	msg.SetHeader("Subject", fmt.Sprintf("Hello %s ..! Your account has been created ", username))
-	msg.SetBody("text/html", mailInfo)
-	// msg.Attach("/home/User/cat.jpg")
-	if index >= len(mailKeys) {
-		fmt.Printf("Cannot send mail..\nLimit Reached..\n")
-		return
-	}
-	n := gomail.NewDialer("smtp.gmail.com", 587, "mailtempmail3@gmail.com", mailKeys[index])
-	index++
+func SendMail(mail string) {
+	url := utils.GoDotEnvVariable("RapidAPI_URL")
 
-	// Send the email
-	if err := n.DialAndSend(msg); err != nil {
-		panic(err)
-	}
+	payload := strings.NewReader(mail)
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("content-type", "application/json")
+	req.Header.Add("X-RapidAPI-Key", utils.GoDotEnvVariable("X-RapidAPI-Key"))
+	req.Header.Add("X-RapidAPI-Host", "rapidprod-sendgrid-v1.p.rapidapi.com")
+
+	res, err := http.DefaultClient.Do(req)
+	utils.CheckError(err)
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
 }
