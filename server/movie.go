@@ -5,14 +5,10 @@ import (
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/rating"
 	"example/movieSuggestion/schema"
-	"log"
 )
 
 // This RPC returns all movies that are present in the database
 func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
-	log.Printf("Getting movies called")
-	// Movies := []schema.Movie{}
-	// s.Db.Find(&Movies)
 	Movies := s.Db.GetAllMovies()
 	for _, movie := range Movies {
 		Movie := &pb.Movie{
