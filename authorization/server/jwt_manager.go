@@ -1,7 +1,7 @@
 package authorization
 
 import (
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
 	"fmt"
 	"time"
 

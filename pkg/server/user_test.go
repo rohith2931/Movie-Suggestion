@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
 	"example/movieSuggestion/utils"
 	"reflect"
 	"testing"
@@ -28,7 +28,7 @@ func TestCreateUser(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().CreateUser(&sampleUser)
+	mockDb.EXPECT().CreateUser(&sampleUser).Return(nil)
 	expected := &pb.User{
 		UserName:    "ram",
 		Password:    "passss",

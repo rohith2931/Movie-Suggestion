@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/utils"
 
@@ -18,7 +18,7 @@ func TestCreateLike(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().CreateLike(gomock.Any(), gomock.Any()).Return("Like created Successfully..")
+	mockDb.EXPECT().CreateLike(gomock.Any(), gomock.Any()).Return("Like created Successfully..", nil)
 	expected := pb.Response{
 		Body: "Like created Successfully..",
 	}
@@ -36,7 +36,7 @@ func TestDeleteLike(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().DeleteLike(gomock.Any(), gomock.Any()).Return("Like Deleted Successfully..")
+	mockDb.EXPECT().DeleteLike(gomock.Any(), gomock.Any()).Return("Like Deleted Successfully..", nil)
 	expected := pb.Response{
 		Body: "Like Deleted Successfully..",
 	}

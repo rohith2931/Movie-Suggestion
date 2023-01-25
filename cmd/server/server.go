@@ -2,10 +2,10 @@ package main
 
 import (
 	authorization "example/movieSuggestion/authorization/server"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
-	"example/movieSuggestion/server"
+	"example/movieSuggestion/pkg/schema"
+	"example/movieSuggestion/pkg/server"
 	"example/movieSuggestion/utils"
 	"log"
 	"net"
@@ -45,9 +45,7 @@ func accessibleRoles() map[string][]string {
 func Run(db *gorm.DB) error {
 	defer db.Close()
 	listen, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	utils.PanicError(err)
 	//initialise a JwtManager
 	jwtManager := authorization.NewJWTManager(secretKey, tokenDuration)
 
@@ -81,9 +79,7 @@ func main() {
 	schema.StartDB()
 	// db connection
 	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
-	if err != nil {
-		panic(err.Error())
-	}
+	utils.PanicError(err)
 
 	if err := Run(db); err != nil {
 		log.Fatal(err.Error())

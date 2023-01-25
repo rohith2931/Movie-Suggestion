@@ -1,7 +1,7 @@
 package server
 
 import (
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
 )
 

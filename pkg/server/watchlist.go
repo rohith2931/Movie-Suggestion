@@ -3,14 +3,14 @@ package server
 import (
 	"context"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/utils"
 )
 
 // This RPC adds movie into the watchlist
 func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUser) (*pb.Movie, error) {
 
-	movie := schema.Movie{}
-	movie = s.Db.AddMovieToWatchlist(in.UserId, in.MovieId)
+	movie, err := s.Db.AddMovieToWatchlist(in.UserId, in.MovieId)
+	utils.CheckError(err)
 
 	return &pb.Movie{
 		Id:          uint64(movie.ID),
@@ -27,8 +27,8 @@ func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUse
 // This RPC gets all movies from the watchlist of a user
 func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*pb.Movies, error) {
 
-	Movies := s.Db.GetAllWatchlistMovies(in.Id)
-
+	Movies, err := s.Db.GetAllWatchlistMovies(in.Id)
+	utils.CheckError(err)
 	AllMovies := []*pb.Movie{}
 	for _, movie := range Movies {
 		AllMovies = append(AllMovies, &pb.Movie{
@@ -48,8 +48,8 @@ func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*p
 // This RPC deletes a movie from the watchlist
 func (s *MsServer) DeleteMovieFromWatchlist(ctx context.Context, in *pb.DeleteMovieByUser) (*pb.Movie, error) {
 
-	movie := schema.Movie{}
-	movie = s.Db.DeleteMovieFromWatchlist(in.UserId, in.MovieId)
+	movie, err := s.Db.DeleteMovieFromWatchlist(in.UserId, in.MovieId)
+	utils.CheckError(err)
 	Deletedmovie := &pb.Movie{
 		Id:          uint64(movie.ID),
 		Name:        movie.Name,

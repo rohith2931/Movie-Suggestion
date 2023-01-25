@@ -42,7 +42,7 @@ func accessibleMethods() map[string]bool {
 
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	utils.CheckError(err)
+	utils.PanicError(err)
 	defer conn.Close()
 
 	//Create a new AuthClient with the provided Credentials
@@ -60,24 +60,25 @@ func main() {
 		grpc.WithUnaryInterceptor(interceptor.Unary()),
 		grpc.WithStreamInterceptor(interceptor.Stream()),
 	)
-	utils.CheckError(err)
+	utils.PanicError(err)
 	defer clientConnection.Close()
 	client := pb.NewMsDatabaseClient(clientConnection)
 
-	createNewUser(client)
+	// createNewUser(client)
 	// createNewMovie(client)
 	// deleteMovie(client)
+	// addMovieToWatchlist(client)
 	// getAllMovies(client)
 	// getMoviesByCategory(client)
-	// addMovieToWatchlist(client)
 	// createReview(client)
 	// updateReview(client)
-	// getAllWatchlistMovies(client)
 	// deleteMovieFromWatchlist(client)
+	getAllWatchlistMovies(client)
 	// createLike(client)
 	// deleteLike(client)
 
 }
+
 func createNewUser(client pb.MsDatabaseClient) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -92,6 +93,68 @@ func createNewUser(client pb.MsDatabaseClient) {
 	})
 	utils.CheckError(err)
 	log.Printf("\nId : %v,User Name: %v, Password: %v, Email: %v, PhoneNumber : %v ", new_user.Id, new_user.GetUserName(), new_user.GetPassword(), new_user.GetEmail(), new_user.GetPhoneNumber())
+}
+
+func addMovieToWatchlist(client pb.MsDatabaseClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Add a movie to Watchlist by user
+	fmt.Println("Adding movie to watchlist:")
+	Movie, err := client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
+		UserId:  1,
+		MovieId: 1,
+	})
+	utils.CheckError(err)
+	fmt.Println(Movie.GetId(), Movie.GetName(), Movie.GetDirector(), Movie.GetDescription(), Movie.GetRating(), Movie.GetLanguage(), Movie.GetCategory(), Movie.GetReleaseDate())
+}
+
+func getAllWatchlistMovies(client pb.MsDatabaseClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Get all movies from the watchlist of a user
+	watchlistMovies, err := client.GetAllWatchlistMovies(ctx, &pb.UserId{Id: 1})
+	utils.CheckError(err)
+	fmt.Println("Watchlist Movies of the User is :")
+	for _, movie := range watchlistMovies.Movies {
+		fmt.Printf("%v\n", movie)
+	}
+}
+
+func deleteMovieFromWatchlist(client pb.MsDatabaseClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Delete a Movie from watchlist of a user
+	fmt.Println("Deleting movie from watchlist:")
+	DeletedMovieByUser, err := client.DeleteMovieFromWatchlist(ctx, &pb.DeleteMovieByUser{
+		UserId:  1,
+		MovieId: 4,
+	})
+	utils.CheckError(err)
+	fmt.Printf("%+v\n", DeletedMovieByUser)
+}
+
+func createLike(client pb.MsDatabaseClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Create a like by a user to a movie
+	RespnseObj, err := client.CreateLike(ctx, &pb.UserLike{
+		UserId:  1,
+		MovieId: 2,
+	})
+	utils.CheckError(err)
+	fmt.Println(RespnseObj.Body)
+}
+
+func deleteLike(client pb.MsDatabaseClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Delete/Unlike a movie by a user
+	RespnseObj, err := client.DeleteLike(ctx, &pb.UserLike{
+		UserId:  1,
+		MovieId: 2,
+	})
+	utils.CheckError(err)
+	fmt.Println(RespnseObj.Body)
 }
 
 func createNewMovie(client pb.MsDatabaseClient) {
@@ -154,44 +217,6 @@ func getMoviesByCategory(client pb.MsDatabaseClient) {
 	}
 }
 
-func addMovieToWatchlist(client pb.MsDatabaseClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	// Add a movie to Watchlist by user
-	fmt.Println("Adding movie to watchlist:")
-	Movie, err := client.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
-		UserId:  1,
-		MovieId: 2,
-	})
-	utils.CheckError(err)
-	fmt.Println(Movie.GetId(), Movie.GetName(), Movie.GetDirector(), Movie.GetDescription(), Movie.GetRating(), Movie.GetLanguage(), Movie.GetCategory(), Movie.GetReleaseDate())
-}
-
-func getAllWatchlistMovies(client pb.MsDatabaseClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	// Get all movies from the watchlist of a user
-	watchlistMovies, err := client.GetAllWatchlistMovies(ctx, &pb.UserId{Id: 1})
-	utils.CheckError(err)
-	fmt.Println("Watchlist Movies of the User is :")
-	for _, movie := range watchlistMovies.Movies {
-		fmt.Printf("%v\n", movie)
-	}
-}
-
-func deleteMovieFromWatchlist(client pb.MsDatabaseClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	// Delete a Movie from watchlist of a user
-	fmt.Println("Deleting movie from watchlist:")
-	DeletedMovieByUser, err := client.DeleteMovieFromWatchlist(ctx, &pb.DeleteMovieByUser{
-		UserId:  1,
-		MovieId: 2,
-	})
-	utils.CheckError(err)
-	fmt.Printf("%+v\n", DeletedMovieByUser)
-}
-
 func createReview(client pb.MsDatabaseClient) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -220,28 +245,4 @@ func updateReview(client pb.MsDatabaseClient) {
 	utils.CheckError(err)
 	fmt.Printf("\nUpdated review is:\n %v\n", updatedReview)
 
-}
-
-func createLike(client pb.MsDatabaseClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	// Create a like by a user to a movie
-	RespnseObj, err := client.CreateLike(ctx, &pb.UserLike{
-		UserId:  1,
-		MovieId: 2,
-	})
-	utils.CheckError(err)
-	fmt.Println(RespnseObj.Body)
-}
-
-func deleteLike(client pb.MsDatabaseClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	// Delete/Unlike a movie by a user
-	RespnseObj, err := client.DeleteLike(ctx, &pb.UserLike{
-		UserId:  1,
-		MovieId: 2,
-	})
-	utils.CheckError(err)
-	fmt.Println(RespnseObj.Body)
 }

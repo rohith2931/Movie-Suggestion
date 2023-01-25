@@ -47,7 +47,7 @@ func (interceptor *ServerAuthInterceptor) Stream() grpc.StreamServerInterceptor 
 		info *grpc.StreamServerInfo,
 		handler grpc.StreamHandler,
 	) error {
-		log.Println("--> stream interceptor: ", info.FullMethod)
+		// log.Println("--> stream interceptor: ", info.FullMethod)
 		err := interceptor.authorize(stream.Context(), info.FullMethod)
 		if err != nil {
 			return err

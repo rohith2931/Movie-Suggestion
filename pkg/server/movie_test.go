@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
 	"example/movieSuggestion/utils"
 	"fmt"
 	"io"
@@ -82,7 +82,7 @@ func TestGetAllMovies(t *testing.T) {
 			Category:    "Drama",
 			ReleaseDate: "12-01-2019",
 		},
-	})
+	}, nil)
 	want := []*pb.Movie{
 		{
 			Name:        "F2",
@@ -136,7 +136,7 @@ func TestGetMovieByCategory(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().GetMovieByCategory(gomock.Any()).Return(sampleMovies)
+	mockDb.EXPECT().GetMovieByCategory(gomock.Any()).Return(sampleMovies, nil)
 	expected := []*pb.Movie{
 		{
 			Name:        "F2",
@@ -173,7 +173,7 @@ func TestAddMovie(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().AddMovie(gomock.Any())
+	mockDb.EXPECT().AddMovie(gomock.Any()).Return(nil)
 	expected := &pb.Movie{
 		Name:        "F2",
 		Director:    "Anil Ravipudi",
@@ -204,7 +204,7 @@ func TestDeleteMovie(t *testing.T) {
 	mockDb := database.NewMockDatabase(controller)
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
-	mockDb.EXPECT().DeleteMovie(gomock.Any()).Return(sampleMovie)
+	mockDb.EXPECT().DeleteMovie(gomock.Any()).Return(sampleMovie, nil)
 	expected := &pb.Movie{
 		Name:        "F2",
 		Director:    "Anil Ravipudi",

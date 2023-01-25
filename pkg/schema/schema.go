@@ -38,11 +38,13 @@ type User struct {
 	Address     string
 	Role        string
 	Watchlist   *Watchlist
-	Review      []Review
+	Reviews     []Review
+	Likes       []Like
 }
 type Watchlist struct {
 	gorm.Model
-	UserID uint
+	UserID          uint
+	WatchlistMovies []WatchlistMovies
 }
 
 type WatchlistMovies struct {
@@ -59,13 +61,16 @@ type Review struct {
 }
 type Movie struct {
 	gorm.Model
-	Name        string
-	Director    string
-	Description string
-	Rating      int
-	Language    string
-	Category    string
-	ReleaseDate string
+	Name            string
+	Director        string
+	Description     string
+	Rating          int
+	Language        string
+	Category        string
+	ReleaseDate     string
+	Likes           []Like
+	Reviews         []Review
+	WatchlistMovies []WatchlistMovies
 }
 
 type Like struct {

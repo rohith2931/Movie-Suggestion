@@ -11,6 +11,12 @@ import (
 // This function checks for error
 func CheckError(err error) {
 	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func PanicError(err error) {
+	if err != nil {
 		panic(err)
 	}
 }

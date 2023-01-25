@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
 	"example/movieSuggestion/utils"
 	"reflect"
 	"testing"
@@ -26,7 +26,7 @@ func TestCreateReview(t *testing.T) {
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 
-	mockDb.EXPECT().CreateReview(gomock.Any())
+	mockDb.EXPECT().CreateReview(gomock.Any()).Return(nil)
 	expected := &pb.Review{
 		Rating:      8,
 		MovieId:     1,
@@ -53,7 +53,7 @@ func TestUpdateReview(t *testing.T) {
 	msServer := MsServer{Db: mockDb}
 	ctx := context.Background()
 
-	mockDb.EXPECT().UpdateReview(gomock.Any(), gomock.Any())
+	mockDb.EXPECT().UpdateReview(gomock.Any(), gomock.Any()).Return(nil)
 	expected := &pb.Review{
 		Rating:      8,
 		MovieId:     1,

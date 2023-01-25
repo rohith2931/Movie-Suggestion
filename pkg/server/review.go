@@ -3,7 +3,8 @@ package server
 import (
 	"context"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
+	"example/movieSuggestion/utils"
 )
 
 // This RPC creates a review for a movie by the user
@@ -14,7 +15,8 @@ func (s *MsServer) CreateReview(ctx context.Context, in *pb.NewReview) (*pb.Revi
 		UserID:      uint(in.UserId),
 		Description: in.Description,
 	}
-	s.Db.CreateReview(&newReview)
+	err := s.Db.CreateReview(&newReview)
+	utils.CheckError(err)
 	return &pb.Review{
 		Id:          uint64(newReview.ID),
 		Rating:      uint64(newReview.Rating),
@@ -32,7 +34,8 @@ func (s *MsServer) UpdateReview(ctx context.Context, in *pb.Review) (*pb.Review,
 		UserID:      uint(in.UserId),
 		Description: in.Description,
 	}
-	s.Db.UpdateReview(in.Id, review)
+	err := s.Db.UpdateReview(in.Id, review)
+	utils.CheckError(err)
 	return &pb.Review{
 		Id:          uint64(in.Id),
 		UserId:      uint64(review.UserID),

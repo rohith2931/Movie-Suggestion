@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/utils"
 	"reflect"
@@ -26,7 +26,7 @@ func TestAddMovieToWatchlist(t *testing.T) {
 		Category:    "Drama",
 		ReleaseDate: "12-01-2019",
 	}
-	mockDb.EXPECT().AddMovieToWatchlist(gomock.Any(), gomock.Any()).Return(sampleMovie)
+	mockDb.EXPECT().AddMovieToWatchlist(gomock.Any(), gomock.Any()).Return(sampleMovie, nil)
 	got, err := msServer.AddMovieToWatchlist(ctx, &pb.AddMovieByUser{
 		MovieId: 1,
 		UserId:  1,
@@ -64,7 +64,7 @@ func TestGetAllWatchlistMovies(t *testing.T) {
 			ReleaseDate: "12-01-2019",
 		},
 	}
-	mockDb.EXPECT().GetAllWatchlistMovies(gomock.Any()).Return(sampleMovies)
+	mockDb.EXPECT().GetAllWatchlistMovies(gomock.Any()).Return(sampleMovies, nil)
 	got, err := msServer.GetAllWatchlistMovies(ctx, &pb.UserId{
 		Id: 1,
 	})
@@ -90,7 +90,7 @@ func TestDeleteMovieFromWatchlist(t *testing.T) {
 		Category:    "Drama",
 		ReleaseDate: "12-01-2019",
 	}
-	mockDb.EXPECT().DeleteMovieFromWatchlist(gomock.Any(), gomock.Any()).Return(sampleMovie)
+	mockDb.EXPECT().DeleteMovieFromWatchlist(gomock.Any(), gomock.Any()).Return(sampleMovie, nil)
 	got, err := msServer.DeleteMovieFromWatchlist(ctx, &pb.DeleteMovieByUser{
 		MovieId: 1,
 		UserId:  1,

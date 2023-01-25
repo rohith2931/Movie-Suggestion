@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/database"
+	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
 	"log"
 	"net"

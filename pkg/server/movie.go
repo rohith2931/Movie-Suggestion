@@ -3,13 +3,15 @@ package server
 import (
 	"context"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/rating"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/rating"
+	"example/movieSuggestion/pkg/schema"
+	"example/movieSuggestion/utils"
 )
 
 // This RPC returns all movies that are present in the database
 func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
-	Movies := s.Db.GetAllMovies()
+	Movies, err := s.Db.GetAllMovies()
+	utils.CheckError(err)
 	for _, movie := range Movies {
 		Movie := &pb.Movie{
 			Id:          uint64(movie.ID),
@@ -31,7 +33,8 @@ func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMo
 // This RPC returns all movies based on category/genere
 func (s *MsServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory) (*pb.Movies, error) {
 	AllMovies := []*pb.Movie{}
-	Movies := s.Db.GetMovieByCategory(in.Category)
+	Movies, err := s.Db.GetMovieByCategory(in.Category)
+	utils.CheckError(err)
 	for _, movie := range Movies {
 		AllMovies = append(AllMovies, &pb.Movie{
 			Id:          uint64(movie.ID),
@@ -64,7 +67,8 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 	} else {
 		newMovie.Rating = int(in.GetRating())
 	}
-	s.Db.AddMovie(&newMovie)
+	err := s.Db.AddMovie(&newMovie)
+	utils.CheckError(err)
 	return &pb.Movie{
 		Name:        newMovie.Name,
 		Director:    newMovie.Director,
@@ -78,8 +82,9 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 
 // This RPC Delete a movie from the database
 func (s *MsServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, error) {
-	movie := schema.Movie{}
-	movie = s.Db.DeleteMovie(in.Id)
+	movie, err := s.Db.DeleteMovie(in.Id)
+	utils.CheckError(err)
+
 	return &pb.Movie{
 		Id:          uint64(movie.ID),
 		Name:        movie.Name,

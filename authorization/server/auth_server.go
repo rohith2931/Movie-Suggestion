@@ -2,10 +2,9 @@ package authorization
 
 import (
 	"context"
-	"log"
 
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/schema"
+	"example/movieSuggestion/pkg/schema"
 
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
@@ -26,7 +25,6 @@ func NewAuthServer(jwtManager *JWTManager, db *gorm.DB) pb.AuthServiceServer {
 
 // This RPC is used to login the user and return jwt token as a response
 func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	log.Println("Server : Logging in the User")
 	user := schema.User{
 		UserName: req.GetUsername(),
 		Password: req.GetPassword(),
