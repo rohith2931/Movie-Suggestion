@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/pkg/database"
 	"example/movieSuggestion/pkg/schema"
 	"example/movieSuggestion/utils"
 	"reflect"
@@ -36,7 +36,7 @@ func TestCreateUser(t *testing.T) {
 		PhoneNumber: "8455612342",
 		Address:     "Hyderabad",
 	}
-	got, err := msServer.CreateUser(ctx, &pb.NewUser{
+	got, err := msServer.CreateUser(ctx, &pb.User{
 		UserName:    "ram",
 		Password:    "passss",
 		Email:       "ram@gmail.com",

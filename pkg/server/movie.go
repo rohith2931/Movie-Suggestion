@@ -3,55 +3,38 @@ package server
 import (
 	"context"
 	pb "example/movieSuggestion/msproto"
-	"example/movieSuggestion/pkg/rating"
+	rating "example/movieSuggestion/pkg/externalAPI"
 	"example/movieSuggestion/pkg/schema"
-	"example/movieSuggestion/utils"
+	"log"
 )
 
 // This RPC returns all movies that are present in the database
-func (s *MsServer) GetAllMovies(in *pb.EmptyMovie, stream pb.MsDatabase_GetAllMoviesServer) error {
-	Movies, err := s.Db.GetAllMovies()
-	utils.CheckError(err)
-	for _, movie := range Movies {
-		Movie := &pb.Movie{
-			Id:          uint64(movie.ID),
+func (s *MsServer) GetAllMovies(in *pb.MovieRequest, stream pb.MovieSuggestionService_GetAllMoviesServer) error {
+	movies, err := s.Db.GetAllMovies(in.GetCategory(), in.GetLanguage())
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	for _, movie := range movies {
+		movie := &pb.Movie{
+			MovieId:     uint64(movie.ID),
 			Name:        movie.Name,
 			Director:    movie.Director,
 			Description: movie.Description,
-			Rating:      uint64(movie.Rating),
+			Rating:      movie.Rating,
 			Language:    movie.Language,
 			Category:    movie.Category,
 			ReleaseDate: movie.ReleaseDate,
 		}
-		if err := stream.Send(Movie); err != nil {
+		if err := stream.Send(movie); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// This RPC returns all movies based on category/genere
-func (s *MsServer) GetMovieByCategory(ctx context.Context, in *pb.MovieCategory) (*pb.Movies, error) {
-	AllMovies := []*pb.Movie{}
-	Movies, err := s.Db.GetMovieByCategory(in.Category)
-	utils.CheckError(err)
-	for _, movie := range Movies {
-		AllMovies = append(AllMovies, &pb.Movie{
-			Id:          uint64(movie.ID),
-			Name:        movie.Name,
-			Director:    movie.Director,
-			Description: movie.Description,
-			Rating:      uint64(movie.Rating),
-			Language:    movie.Language,
-			Category:    movie.Category,
-			ReleaseDate: movie.ReleaseDate,
-		})
-	}
-	return &pb.Movies{Movies: AllMovies}, nil
-}
-
 // This RPC adds movie into the database
-func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, error) {
+func (s *MsServer) AddMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, error) {
 
 	newMovie := schema.Movie{
 		Name:        in.GetName(),
@@ -65,34 +48,35 @@ func (s *MsServer) AddMovie(ctx context.Context, in *pb.NewMovie) (*pb.Movie, er
 		newMovie.Rating = rating.GetImdbRating(newMovie.Name)
 
 	} else {
-		newMovie.Rating = int(in.GetRating())
+		newMovie.Rating = in.GetRating()
 	}
 	err := s.Db.AddMovie(&newMovie)
-	utils.CheckError(err)
+	if err != nil {
+		log.Println(err)
+		return &pb.Movie{}, err
+	}
 	return &pb.Movie{
+		MovieId:     uint64(newMovie.ID),
 		Name:        newMovie.Name,
 		Director:    newMovie.Director,
 		Description: newMovie.Description,
-		Rating:      uint64(newMovie.Rating),
+		Rating:      newMovie.Rating,
 		Language:    newMovie.Language,
 		Category:    newMovie.Category,
 		ReleaseDate: newMovie.ReleaseDate,
-		Id:          uint64(newMovie.ID)}, nil
+	}, nil
 }
 
 // This RPC Delete a movie from the database
-func (s *MsServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.Movie, error) {
-	movie, err := s.Db.DeleteMovie(in.Id)
-	utils.CheckError(err)
+func (s *MsServer) DeleteMovie(ctx context.Context, in *pb.Movie) (*pb.DeleteMovieResponse, error) {
+	err := s.Db.DeleteMovie(in.MovieId)
+	if err != nil {
+		log.Println(err)
+		return &pb.DeleteMovieResponse{}, err
+	}
 
-	return &pb.Movie{
-		Id:          uint64(movie.ID),
-		Name:        movie.Name,
-		Director:    movie.Director,
-		Description: movie.Description,
-		Rating:      uint64(movie.Rating),
-		Language:    movie.Language,
-		Category:    movie.Category,
-		ReleaseDate: movie.ReleaseDate,
+	return &pb.DeleteMovieResponse{
+		MovieId: in.GetMovieId(),
+		Status:  "Movie Deleted Successfully",
 	}, nil
 }

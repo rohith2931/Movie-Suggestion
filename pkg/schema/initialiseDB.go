@@ -3,7 +3,13 @@ package schema
 import "github.com/jinzhu/gorm"
 
 func InitialiseDB(db *gorm.DB) {
-	defer db.Close()
+	db.Model(&Review{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
+	db.Model(&Review{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
+	db.Model(&Like{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
+	db.Model(&Like{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
+	db.Model(&Watchlist{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
+	db.Model(&WatchlistMovies{}).AddForeignKey("watchlist_id", "watchlists(id)", "CASCADE", "CASCADE")
+	db.Model(&WatchlistMovies{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
 	db.Save(&Movie{
 		Name:        "KGF",
 		Director:    "Prashanth Neel",

@@ -9,13 +9,14 @@ import (
 )
 
 // This function returns the Imdb rating of a movie
-func GetImdbRating(movieName string) int {
+func GetImdbRating(movieName string) float32 {
 
-	url := fmt.Sprintf("https://mdblist.p.rapidapi.com/?s=%s&l=1", movieName)
-	req, _ := http.NewRequest("GET", url, nil)
+	url := utils.GoDotEnvVariable("X-RapidAPI-URL")
+	search := fmt.Sprintf("/?s=%s&l=1", movieName)
+	req, _ := http.NewRequest("GET", url+search, nil)
 
-	req.Header.Add("X-RapidAPI-Key", "2636fc2a6cmshe12aded30b561dcp132388jsn7f2610a57bd0")
-	req.Header.Add("X-RapidAPI-Host", "mdblist.p.rapidapi.com")
+	req.Header.Add("X-RapidAPI-Key", utils.GoDotEnvVariable("X-RapidAPI-Key"))
+	req.Header.Add("X-RapidAPI-Host", utils.GoDotEnvVariable("X-RapidAPI-Host"))
 
 	res, err := http.DefaultClient.Do(req)
 	utils.CheckError(err)
@@ -26,7 +27,7 @@ func GetImdbRating(movieName string) int {
 	var responseObj Response
 	json.Unmarshal(body, &responseObj)
 
-	rating := responseObj.MovieRatings[0].Rating / 10
+	rating := float32(responseObj.MovieRatings[0].Rating) / float32(10)
 	return rating
 }
 

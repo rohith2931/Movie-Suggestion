@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+option go_package = "example/movieSuggestion";
+
+package msproto;
+
+service MovieSuggestionService {
+    rpc CreateUser(User) returns (User){}
+    rpc GetAllMovies(MovieRequest) returns (stream Movie){}
+    // rpc GetMovieByCategory(MovieCategory) returns (Movies){}
+    rpc AddMovie(Movie) returns (Movie){}
+    rpc DeleteMovie(Movie) returns (DeleteMovieResponse){}
+    rpc AddMovieToWatchlist(AddMovieToWatchlistRequest) returns (AddMovieToWatchlistResponse){}
+    rpc GetAllWatchlistMovies(GetAllWatchlistMoviesRequest) returns (stream Movie){}
+    rpc DeleteMovieFromWatchlist(DeleteMovieFromWatchlistRequest) returns (DeleteMovieFromWatchlistResponse){}
+    rpc CreateReview(Review) returns (Review){}
+    rpc UpdateReview(Review) returns (Review){}
+    rpc DeleteReview(DeleteReviewRequest) returns (DeleteReviewResponse){}
+    rpc CreateLike(UserLikeRequest) returns (UserLikeResponse){}
+    rpc DeleteLike(UserLikeRequest) returns (UserLikeResponse){}
+}
+
+message User {
+    uint64 user_id = 1;
+    string user_name = 2;
+    string password = 3;
+    string email = 4;
+    string phone_number = 5;
+    string address=6;
+} 
+
+message GetAllWatchlistMoviesRequest {
+    uint64 user_id=1;
+}
+
+message MovieRequest {
+    string category=1;
+    string language=2;
+}
+
+message Movie {
+    uint64 movie_id = 1;
+    string name = 2;
+    string director = 3;
+    string description = 4;
+    float  rating = 5;
+    string language = 6;
+    string category = 7;
+    string release_date = 8;
+}
+
+message DeleteMovieResponse {
+    uint64 movie_id=1;
+    string status=2;
+}
+
+message AddMovieToWatchlistRequest {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
+message AddMovieToWatchlistResponse {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+    string status=3;
+}
+
+message DeleteMovieFromWatchlistRequest {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
+message DeleteMovieFromWatchlistResponse {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+    string status=3;
+}
+
+
+message Review {
+    uint64 review_id=1;
+    float rating =2;
+    uint64 movie_id=3;
+    uint64 user_id=4;
+    string description=5;
+}
+
+message DeleteReviewRequest{
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
+message DeleteReviewResponse{
+    uint64 user_id=1;
+    uint64 movie_id=2;
+    string status=3;
+}
+
+message UserLikeRequest {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+}
+
+message UserLikeResponse {
+    uint64 user_id=1;
+    uint64 movie_id=2;
+    string status=3;
+}

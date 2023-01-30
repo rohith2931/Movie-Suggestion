@@ -1,15 +1,10 @@
 package schema
 
 import (
-	"example/movieSuggestion/utils"
-
 	"github.com/jinzhu/gorm"
 )
 
-func StartDB() {
-	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
-
-	utils.CheckError(err)
+func StartDB(db *gorm.DB) {
 
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Watchlist{})
@@ -17,14 +12,6 @@ func StartDB() {
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&Movie{})
 	db.AutoMigrate(&Like{})
-
-	db.Model(&Review{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
-	db.Model(&Review{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
-	db.Model(&Like{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
-	db.Model(&Like{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
-	db.Model(&Watchlist{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
-	db.Model(&WatchlistMovies{}).AddForeignKey("watchlist_id", "watchlists(id)", "CASCADE", "CASCADE")
-	db.Model(&WatchlistMovies{}).AddForeignKey("movie_id", "movies(id)", "CASCADE", "CASCADE")
 
 	InitialiseDB(db)
 }
@@ -54,7 +41,7 @@ type WatchlistMovies struct {
 }
 type Review struct {
 	gorm.Model
-	Rating      int
+	Rating      float32
 	MovieID     uint
 	UserID      uint
 	Description string
@@ -64,7 +51,7 @@ type Movie struct {
 	Name            string
 	Director        string
 	Description     string
-	Rating          int
+	Rating          float32
 	Language        string
 	Category        string
 	ReleaseDate     string

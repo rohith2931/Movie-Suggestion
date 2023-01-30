@@ -5,11 +5,11 @@ import (
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/pkg/Mail"
 	"example/movieSuggestion/pkg/schema"
-	"example/movieSuggestion/utils"
+	"log"
 )
 
 // This RPC creates a user
-func (s *MsServer) CreateUser(ctx context.Context, in *pb.NewUser) (*pb.User, error) {
+func (s *MsServer) CreateUser(ctx context.Context, in *pb.User) (*pb.User, error) {
 	newUser := schema.User{
 		UserName:    in.GetUserName(),
 		Password:    in.GetPassword(),
@@ -20,8 +20,11 @@ func (s *MsServer) CreateUser(ctx context.Context, in *pb.NewUser) (*pb.User, er
 		Watchlist:   &schema.Watchlist{},
 	}
 	err := s.Db.CreateUser(&newUser)
-	utils.CheckError(err)
+	if err != nil {
+		log.Println(err)
+		return &pb.User{}, err
+	}
 	mailInfo := Mail.MailInfo(in.GetUserName(), in.GetEmail())
 	go Mail.SendMail(mailInfo)
-	return &pb.User{UserName: in.GetUserName(), Password: in.GetPassword(), Email: in.GetEmail(), PhoneNumber: in.GetPhoneNumber(), Id: uint64(newUser.ID), Address: in.Address}, nil
+	return &pb.User{UserId: uint64(newUser.ID), UserName: in.GetUserName(), Password: in.GetPassword(), Email: in.GetEmail(), PhoneNumber: in.GetPhoneNumber(), Address: in.Address}, nil
 }

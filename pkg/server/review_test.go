@@ -33,7 +33,7 @@ func TestCreateReview(t *testing.T) {
 		UserId:      1,
 		Description: "Good",
 	}
-	got, err := msServer.CreateReview(ctx, &pb.NewReview{
+	got, err := msServer.CreateReview(ctx, &pb.Review{
 		Rating:      8,
 		MovieId:     1,
 		UserId:      1,

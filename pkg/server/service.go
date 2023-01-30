@@ -1,12 +1,12 @@
 package server
 
 import (
-	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/pkg/database"
 )
 
 // This struct implements all the RPC's
 type MsServer struct {
-	pb.UnimplementedMsDatabaseServer
+	pb.UnimplementedMovieSuggestionServiceServer
 	Db database.Database
 }

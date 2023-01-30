@@ -2,8 +2,8 @@ package server
 
 import (
 	"context"
-	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/pkg/database"
 	"log"
 	"net"
 
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
-func MockServer(mockDb *database.MockDatabase, ctx context.Context) (pb.MsDatabaseClient, func()) {
+func MockServer(mockDb *database.MockDatabase, ctx context.Context) (pb.MovieSuggestionServiceClient, func()) {
 	buffer := 101024 * 1024
 	lis := bufconn.Listen(buffer)
 
@@ -20,7 +20,7 @@ func MockServer(mockDb *database.MockDatabase, ctx context.Context) (pb.MsDataba
 	s := MsServer{
 		Db: mockDb,
 	}
-	pb.RegisterMsDatabaseServer(baseServer, &s)
+	pb.RegisterMovieSuggestionServiceServer(baseServer, &s)
 	go func() {
 		if err := baseServer.Serve(lis); err != nil {
 			log.Printf("error serving server: %v", err)
@@ -43,7 +43,7 @@ func MockServer(mockDb *database.MockDatabase, ctx context.Context) (pb.MsDataba
 		baseServer.Stop()
 	}
 
-	client := pb.NewMsDatabaseClient(conn)
+	client := pb.NewMovieSuggestionServiceClient(conn)
 
 	return client, closer
 }

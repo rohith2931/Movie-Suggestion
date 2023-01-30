@@ -2,8 +2,8 @@ package main
 
 import (
 	authorization "example/movieSuggestion/authorization/server"
-	"example/movieSuggestion/pkg/database"
 	pb "example/movieSuggestion/msproto"
+	"example/movieSuggestion/pkg/database"
 	"example/movieSuggestion/pkg/schema"
 	"example/movieSuggestion/pkg/server"
 	"example/movieSuggestion/utils"
@@ -25,11 +25,11 @@ const (
 
 // This function returns list of roles who can access an endpoint/RPC
 func accessibleRoles() map[string][]string {
-	const msService = "/msproto.MsDatabase/"
+	const msService = "/msproto.MovieSuggestionService/"
 	return map[string][]string{
-		msService + "CreateUser":               {"admin"},
 		msService + "AddMovie":                 {"admin"},
 		msService + "DeleteMovie":              {"admin"},
+		msService + "CreateUser":               {"admin", "user"},
 		msService + "GetAllMovies":             {"admin", "user"},
 		msService + "GetMovieByCategory":       {"admin", "user"},
 		msService + "AddMovieToWatchlist":      {"admin", "user"},
@@ -65,21 +65,23 @@ func Run(db *gorm.DB) error {
 	pb.RegisterAuthServiceServer(new_server, authServer)
 
 	//Register the main service
-	pb.RegisterMsDatabaseServer(new_server, &server.MsServer{
+	pb.RegisterMovieSuggestionServiceServer(new_server, &server.MsServer{
 		Db: database.DBclient{Db: db},
 	})
 
 	reflection.Register(new_server)
 
-	log.Printf("Using port no %v", listen.Addr())
+	log.Printf("Using  Address %v", listen.Addr())
 
 	return new_server.Serve(listen)
 }
 func main() {
-	schema.StartDB()
+
 	// db connection
 	db, err := gorm.Open("postgres", utils.GoDotEnvVariable("DB_URL"))
 	utils.PanicError(err)
+
+	schema.StartDB(db)
 
 	if err := Run(db); err != nil {
 		log.Fatal(err.Error())

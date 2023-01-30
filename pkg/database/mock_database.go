@@ -49,12 +49,11 @@ func (mr *MockDatabaseMockRecorder) AddMovie(arg0 interface{}) *gomock.Call {
 }
 
 // AddMovieToWatchlist mocks base method.
-func (m *MockDatabase) AddMovieToWatchlist(arg0, arg1 uint64) (schema.Movie, error) {
+func (m *MockDatabase) AddMovieToWatchlist(arg0, arg1 uint64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMovieToWatchlist", arg0, arg1)
-	ret0, _ := ret[0].(schema.Movie)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // AddMovieToWatchlist indicates an expected call of AddMovieToWatchlist.
@@ -122,12 +121,11 @@ func (mr *MockDatabaseMockRecorder) DeleteLike(arg0, arg1 interface{}) *gomock.C
 }
 
 // DeleteMovie mocks base method.
-func (m *MockDatabase) DeleteMovie(arg0 uint64) (schema.Movie, error) {
+func (m *MockDatabase) DeleteMovie(arg0 uint64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMovie", arg0)
-	ret0, _ := ret[0].(schema.Movie)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteMovie indicates an expected call of DeleteMovie.
@@ -137,12 +135,11 @@ func (mr *MockDatabaseMockRecorder) DeleteMovie(arg0 interface{}) *gomock.Call {
 }
 
 // DeleteMovieFromWatchlist mocks base method.
-func (m *MockDatabase) DeleteMovieFromWatchlist(arg0, arg1 uint64) (schema.Movie, error) {
+func (m *MockDatabase) DeleteMovieFromWatchlist(arg0, arg1 uint64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMovieFromWatchlist", arg0, arg1)
-	ret0, _ := ret[0].(schema.Movie)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteMovieFromWatchlist indicates an expected call of DeleteMovieFromWatchlist.
@@ -151,19 +148,33 @@ func (mr *MockDatabaseMockRecorder) DeleteMovieFromWatchlist(arg0, arg1 interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMovieFromWatchlist", reflect.TypeOf((*MockDatabase)(nil).DeleteMovieFromWatchlist), arg0, arg1)
 }
 
-// GetAllMovies mocks base method.
-func (m *MockDatabase) GetAllMovies() ([]schema.Movie, error) {
+// DeleteReview mocks base method.
+func (m *MockDatabase) DeleteReview(arg0, arg1 uint64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllMovies")
+	ret := m.ctrl.Call(m, "DeleteReview", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteReview indicates an expected call of DeleteReview.
+func (mr *MockDatabaseMockRecorder) DeleteReview(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReview", reflect.TypeOf((*MockDatabase)(nil).DeleteReview), arg0, arg1)
+}
+
+// GetAllMovies mocks base method.
+func (m *MockDatabase) GetAllMovies(arg0, arg1 string) ([]schema.Movie, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllMovies", arg0, arg1)
 	ret0, _ := ret[0].([]schema.Movie)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllMovies indicates an expected call of GetAllMovies.
-func (mr *MockDatabaseMockRecorder) GetAllMovies() *gomock.Call {
+func (mr *MockDatabaseMockRecorder) GetAllMovies(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllMovies", reflect.TypeOf((*MockDatabase)(nil).GetAllMovies))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllMovies", reflect.TypeOf((*MockDatabase)(nil).GetAllMovies), arg0, arg1)
 }
 
 // GetAllWatchlistMovies mocks base method.
@@ -179,21 +190,6 @@ func (m *MockDatabase) GetAllWatchlistMovies(arg0 uint64) ([]schema.Movie, error
 func (mr *MockDatabaseMockRecorder) GetAllWatchlistMovies(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllWatchlistMovies", reflect.TypeOf((*MockDatabase)(nil).GetAllWatchlistMovies), arg0)
-}
-
-// GetMovieByCategory mocks base method.
-func (m *MockDatabase) GetMovieByCategory(arg0 string) ([]schema.Movie, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMovieByCategory", arg0)
-	ret0, _ := ret[0].([]schema.Movie)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMovieByCategory indicates an expected call of GetMovieByCategory.
-func (mr *MockDatabaseMockRecorder) GetMovieByCategory(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovieByCategory", reflect.TypeOf((*MockDatabase)(nil).GetMovieByCategory), arg0)
 }
 
 // UpdateReview mocks base method.

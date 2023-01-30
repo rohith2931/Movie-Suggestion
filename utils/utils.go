@@ -25,7 +25,7 @@ func PanicError(err error) {
 func GoDotEnvVariable(key string) string {
 
 	// load .env file
-	err := godotenv.Load(filepath.Join("/home/rohith/Pet_Project/Movie Suggestion", ".env"))
+	err := godotenv.Load(filepath.Join("/home/rohith/Pet_Project/Movie_Suggestion", ".env"))
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")

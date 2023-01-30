@@ -4,61 +4,58 @@ import (
 	"context"
 	pb "example/movieSuggestion/msproto"
 	"example/movieSuggestion/utils"
+	"log"
 )
 
 // This RPC adds movie into the watchlist
-func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieByUser) (*pb.Movie, error) {
+func (s *MsServer) AddMovieToWatchlist(ctx context.Context, in *pb.AddMovieToWatchlistRequest) (*pb.AddMovieToWatchlistResponse, error) {
 
-	movie, err := s.Db.AddMovieToWatchlist(in.UserId, in.MovieId)
-	utils.CheckError(err)
-
-	return &pb.Movie{
-		Id:          uint64(movie.ID),
-		Name:        movie.Name,
-		Director:    movie.Director,
-		Description: movie.Description,
-		Rating:      uint64(movie.Rating),
-		Language:    movie.Language,
-		Category:    movie.Category,
-		ReleaseDate: movie.ReleaseDate,
+	err := s.Db.AddMovieToWatchlist(in.UserId, in.MovieId)
+	if err != nil {
+		log.Println(err)
+		return &pb.AddMovieToWatchlistResponse{}, err
+	}
+	return &pb.AddMovieToWatchlistResponse{
+		MovieId: in.GetMovieId(),
+		UserId:  in.GetUserId(),
+		Status:  "Movie Added Successfully",
 	}, nil
 }
 
 // This RPC gets all movies from the watchlist of a user
-func (s *MsServer) GetAllWatchlistMovies(ctx context.Context, in *pb.UserId) (*pb.Movies, error) {
+func (s *MsServer) GetAllWatchlistMovies(in *pb.GetAllWatchlistMoviesRequest, stream pb.MovieSuggestionService_GetAllWatchlistMoviesServer) error {
 
-	Movies, err := s.Db.GetAllWatchlistMovies(in.Id)
-	utils.CheckError(err)
-	AllMovies := []*pb.Movie{}
+	Movies, err := s.Db.GetAllWatchlistMovies(in.UserId)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	for _, movie := range Movies {
-		AllMovies = append(AllMovies, &pb.Movie{
-			Id:          uint64(movie.ID),
+		Movie := &pb.Movie{
+			MovieId:     uint64(movie.ID),
 			Name:        movie.Name,
 			Director:    movie.Director,
 			Description: movie.Description,
-			Rating:      uint64(movie.Rating),
+			Rating:      movie.Rating,
 			Language:    movie.Language,
 			Category:    movie.Category,
 			ReleaseDate: movie.ReleaseDate,
-		})
+		}
+		if err := stream.Send(Movie); err != nil {
+			return err
+		}
 	}
-	return &pb.Movies{Movies: AllMovies}, nil
+	return nil
 }
 
 // This RPC deletes a movie from the watchlist
-func (s *MsServer) DeleteMovieFromWatchlist(ctx context.Context, in *pb.DeleteMovieByUser) (*pb.Movie, error) {
+func (s *MsServer) DeleteMovieFromWatchlist(ctx context.Context, in *pb.DeleteMovieFromWatchlistRequest) (*pb.DeleteMovieFromWatchlistResponse, error) {
 
-	movie, err := s.Db.DeleteMovieFromWatchlist(in.UserId, in.MovieId)
+	err := s.Db.DeleteMovieFromWatchlist(in.UserId, in.MovieId)
 	utils.CheckError(err)
-	Deletedmovie := &pb.Movie{
-		Id:          uint64(movie.ID),
-		Name:        movie.Name,
-		Director:    movie.Director,
-		Description: movie.Description,
-		Rating:      uint64(movie.Rating),
-		Language:    movie.Language,
-		Category:    movie.Category,
-		ReleaseDate: movie.ReleaseDate,
-	}
-	return Deletedmovie, nil
+	return &pb.DeleteMovieFromWatchlistResponse{
+		UserId:  in.UserId,
+		MovieId: in.MovieId,
+		Status:  "Movie Deleted from watchlist successfully",
+	}, nil
 }
